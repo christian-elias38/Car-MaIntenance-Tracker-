@@ -4,6 +4,7 @@ import '../../../../core/theme/app_colors.dart';
 import '../providers/vehicle_provider.dart';
 import '../widgets/add_vehicle_dialog.dart';
 import '../../data/models/vehicle_model.dart';
+import 'vehicle_details_screen.dart';
 
 class VehiclesScreen extends StatelessWidget {
   const VehiclesScreen({super.key});
@@ -101,25 +102,32 @@ class VehiclesScreen extends StatelessWidget {
               child: InkWell(
                 onTap: () {
                   vehicleProvider.selectVehicle(vehicle.id);
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => VehicleDetailsScreen(vehicle: vehicle),
+                    ),
+                  );
                 },
                 borderRadius: BorderRadius.circular(20),
                 child: Padding(
                   padding: const EdgeInsets.all(16),
                   child: Row(
                     children: [
-                      // Car Avatar Icon
+                      // Car Photo Thumbnail
                       Container(
-                        width: 64,
-                        height: 64,
+                        width: 72,
+                        height: 56,
                         decoration: BoxDecoration(
-                          color: isDark ? AppColors.darkSurface : AppColors.mintBackground,
-                          borderRadius: BorderRadius.circular(16),
+                          borderRadius: BorderRadius.circular(14),
                         ),
-                        child: const Center(
-                          child: Icon(
-                            Icons.directions_car_filled_rounded,
-                            color: AppColors.primaryLight,
-                            size: 38,
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(14),
+                          child: Image.asset(
+                            vehicle.make.toLowerCase().contains('toyota')
+                                ? 'assets/images/toyota_corolla.jpg'
+                                : 'assets/images/honda_civic.jpg',
+                            fit: BoxFit.cover,
                           ),
                         ),
                       ),
