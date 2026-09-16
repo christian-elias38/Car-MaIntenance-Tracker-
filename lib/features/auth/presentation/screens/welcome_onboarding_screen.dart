@@ -19,17 +19,17 @@ class _WelcomeOnboardingScreenState extends State<WelcomeOnboardingScreen> {
     {
       'title': "Stay on Top of Your Car's Health",
       'subtitle': 'Get reminders, track services, manage costs and keep your vehicle running smoothly.',
-      'icon': '🚗',
+      'image': 'assets/images/car_onboarding.jpg',
     },
     {
       'title': 'Track Maintenance & Expenses',
       'subtitle': 'Log oil changes, tire rotations, brake checks, and view simple expense reports anytime.',
-      'icon': '🛠️',
+      'image': 'assets/images/car_onboarding.jpg',
     },
     {
       'title': 'Smart Service Reminders',
       'subtitle': 'Never miss an upcoming oil change or vehicle inspection with automated reminders.',
-      'icon': '📅',
+      'image': 'assets/images/car_onboarding.jpg',
     },
   ];
 
@@ -77,90 +77,63 @@ class _WelcomeOnboardingScreenState extends State<WelcomeOnboardingScreen> {
                   itemCount: _pages.length,
                   itemBuilder: (context, index) {
                     final item = _pages[index];
-                    return Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        // Hero Illustration Circle
-                        Container(
-                          width: 220,
-                          height: 220,
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            color: isDark ? AppColors.darkSurface : AppColors.mintBackground,
-                            boxShadow: [
-                              BoxShadow(
-                                color: AppColors.primary.withOpacity(0.12),
-                                blurRadius: 30,
-                                offset: const Offset(0, 10),
-                              ),
-                            ],
-                          ),
-                          child: Center(
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Text(
-                                  item['icon']!,
-                                  style: const TextStyle(fontSize: 72),
-                                ),
-                                const SizedBox(height: 12),
-                                Container(
-                                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                                  decoration: BoxDecoration(
-                                    color: AppColors.primaryLight.withOpacity(0.15),
-                                    borderRadius: BorderRadius.circular(20),
-                                  ),
-                                  child: const FittedBox(
-                                    child: Row(
-                                      mainAxisSize: MainAxisSize.min,
-                                      children: [
-                                        Icon(Icons.check_circle, size: 14, color: AppColors.primaryLight),
-                                        SizedBox(width: 4),
-                                        Text(
-                                          'CarTrack Verified',
-                                          style: TextStyle(
-                                            fontSize: 11,
-                                            fontWeight: FontWeight.bold,
-                                            color: AppColors.primaryLight,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
+                    return SingleChildScrollView(
+                      physics: const ClampingScrollPhysics(),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          // Hero Image Circle Container
+                          Container(
+                            width: 220,
+                            height: 220,
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              color: isDark ? AppColors.darkSurface : AppColors.mintBackground,
+                              boxShadow: [
+                                BoxShadow(
+                                  color: AppColors.primary.withOpacity(0.08),
+                                  blurRadius: 25,
+                                  offset: const Offset(0, 10),
                                 ),
                               ],
                             ),
-                          ),
-                        ),
-                        const SizedBox(height: 40),
-
-                        // Title
-                        Text(
-                          item['title']!,
-                          textAlign: TextAlign.center,
-                          style: TextStyle(
-                            fontSize: 26,
-                            fontWeight: FontWeight.bold,
-                            height: 1.25,
-                            color: isDark ? AppColors.darkTextPrimary : AppColors.lightTextPrimary,
-                          ),
-                        ),
-                        const SizedBox(height: 14),
-
-                        // Subtitle
-                        Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 12),
-                          child: Text(
-                            item['subtitle']!,
-                            textAlign: TextAlign.center,
-                            style: TextStyle(
-                              fontSize: 15,
-                              height: 1.5,
-                              color: isDark ? AppColors.darkTextSecondary : AppColors.lightTextSecondary,
+                            child: ClipOval(
+                              child: Image.asset(
+                                item['image']!,
+                                fit: BoxFit.cover,
+                              ),
                             ),
                           ),
-                        ),
-                      ],
+                          const SizedBox(height: 20),
+
+                          // Title
+                          Text(
+                            item['title']!,
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              fontSize: 22,
+                              fontWeight: FontWeight.bold,
+                              height: 1.25,
+                              color: isDark ? AppColors.darkTextPrimary : AppColors.lightTextPrimary,
+                            ),
+                          ),
+                          const SizedBox(height: 10),
+
+                          // Subtitle
+                          Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 16),
+                            child: Text(
+                              item['subtitle']!,
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                fontSize: 14,
+                                height: 1.4,
+                                color: isDark ? AppColors.darkTextSecondary : AppColors.lightTextSecondary,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
                     );
                   },
                 ),
@@ -178,19 +151,19 @@ class _WelcomeOnboardingScreenState extends State<WelcomeOnboardingScreen> {
                     height: 8,
                     decoration: BoxDecoration(
                       color: _currentPage == idx
-                          ? (isDark ? AppColors.primaryLight : AppColors.primary)
+                          ? AppColors.primaryLight
                           : (isDark ? AppColors.darkBorder : Colors.grey[300]),
                       borderRadius: BorderRadius.circular(4),
                     ),
                   ),
                 ),
               ),
-              const SizedBox(height: 32),
+              const SizedBox(height: 30),
 
               // Get Started Button
               SizedBox(
                 width: double.infinity,
-                height: 56,
+                height: 54,
                 child: ElevatedButton(
                   onPressed: () {
                     if (_currentPage < _pages.length - 1) {
@@ -203,9 +176,9 @@ class _WelcomeOnboardingScreenState extends State<WelcomeOnboardingScreen> {
                     }
                   },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: isDark ? AppColors.primaryLight : AppColors.primary,
+                    backgroundColor: AppColors.primaryLight,
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(30),
+                      borderRadius: BorderRadius.circular(27),
                     ),
                     elevation: 2,
                   ),
