@@ -12,20 +12,8 @@ class RemindersScreen extends StatefulWidget {
   State<RemindersScreen> createState() => _RemindersScreenState();
 }
 
-class _RemindersScreenState extends State<RemindersScreen> with SingleTickerProviderStateMixin {
-  late TabController _tabController;
-
-  @override
-  void initState() {
-    super.initState();
-    _tabController = TabController(length: 2, vsync: this);
-  }
-
-  @override
-  void dispose() {
-    _tabController.dispose();
-    super.dispose();
-  }
+class _RemindersScreenState extends State<RemindersScreen> {
+  bool _showUpcoming = true;
 
   void _showAddReminderDialog(BuildContext context) {
     final titleController = TextEditingController();
@@ -118,151 +106,206 @@ class _RemindersScreenState extends State<RemindersScreen> with SingleTickerProv
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final reminderProvider = context.watch<ReminderProvider>();
+    final list = _showUpcoming ? reminderProvider.upcomingReminders : reminderProvider.completedReminders;
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Maintenance Reminders'),
+        title: const Text('Reminders'),
         elevation: 0,
-        bottom: TabBar(
-          controller: _tabController,
-          indicatorColor: AppColors.primaryLight,
-          labelColor: AppColors.primaryLight,
-          unselectedLabelColor: isDark ? AppColors.darkTextSecondary : AppColors.lightTextSecondary,
-          labelStyle: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
-          tabs: [
-            Tab(text: 'Upcoming (${reminderProvider.upcomingReminders.length})'),
-            Tab(text: 'Completed (${reminderProvider.completedReminders.length})'),
-          ],
-        ),
       ),
-      body: TabBarView(
-        controller: _tabController,
-        children: [
-          _buildReminderList(context, reminderProvider.upcomingReminders, isDark, false),
-          _buildReminderList(context, reminderProvider.completedReminders, isDark, true),
-        ],
-      ),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: () => _showAddReminderDialog(context),
-        backgroundColor: isDark ? AppColors.primaryLight : AppColors.primary,
-        icon: const Icon(Icons.alarm_add, color: Colors.white),
-        label: const Text('Add Reminder', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
-      ),
-    );
-  }
-
-  Widget _buildReminderList(
-    BuildContext context,
-    List<ReminderModel> list,
-    bool isDark,
-    bool isCompletedTab,
-  ) {
-    if (list.isEmpty) {
-      return Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(
-              isCompletedTab ? Icons.check_circle_outline : Icons.notifications_off_outlined,
-              size: 64,
-              color: isDark ? AppColors.darkTextSecondary : AppColors.lightTextSecondary,
-            ),
-            const SizedBox(height: 12),
-            Text(
-              isCompletedTab ? 'No completed reminders yet' : 'No upcoming reminders scheduled',
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-                color: isDark ? AppColors.darkTextPrimary : AppColors.lightTextPrimary,
-              ),
-            ),
-            const SizedBox(height: 6),
-            Text(
-              isCompletedTab
-                  ? 'Completed tasks will appear here.'
-                  : 'Tap + to set a reminder for your next oil change or inspection.',
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                fontSize: 13,
-                color: isDark ? AppColors.darkTextSecondary : AppColors.lightTextSecondary,
-              ),
-            ),
-          ],
-        ),
-      );
-    }
-
-    return ListView.builder(
-      padding: const EdgeInsets.all(20),
-      itemCount: list.length,
-      itemBuilder: (context, index) {
-        final item = list[index];
-        return Container(
-          margin: const EdgeInsets.only(bottom: 12),
-          decoration: BoxDecoration(
-            color: isDark ? AppColors.darkCard : Colors.white,
-            borderRadius: BorderRadius.circular(16),
-            border: Border.all(
-              color: isDark ? AppColors.darkBorder : AppColors.lightBorder,
-            ),
-          ),
-          child: ListTile(
-            contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-            leading: Checkbox(
-              value: item.isCompleted,
-              activeColor: AppColors.primaryLight,
-              onChanged: (_) {
-                context.read<ReminderProvider>().toggleReminderComplete(item.id);
-              },
-            ),
-            title: Text(
-              item.title,
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-                decoration: item.isCompleted ? TextDecoration.lineThrough : null,
-                color: item.isCompleted
-                    ? (isDark ? AppColors.darkTextSecondary : AppColors.lightTextSecondary)
-                    : (isDark ? AppColors.darkTextPrimary : AppColors.lightTextPrimary),
-              ),
-            ),
-            subtitle: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const SizedBox(height: 4),
-                Text(
-                  '${item.carName} • ${item.serviceCategory}',
-                  style: TextStyle(
-                    fontSize: 13,
-                    color: isDark ? AppColors.darkTextSecondary : AppColors.lightTextSecondary,
-                  ),
+      body: SafeArea(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+          child: Column(
+            children: [
+              // Pill Switcher Container (Matching Image 2 Screen 9)
+              Container(
+                height: 48,
+                padding: const EdgeInsets.all(4),
+                decoration: BoxDecoration(
+                  color: isDark ? AppColors.darkCard : AppColors.mintBackground,
+                  borderRadius: BorderRadius.circular(24),
                 ),
-                const SizedBox(height: 4),
-                Row(
+                child: Row(
                   children: [
-                    const Icon(Icons.calendar_month, size: 14, color: AppColors.primaryLight),
-                    const SizedBox(width: 4),
-                    Text(
-                      'Due: ${item.dueDate} (${item.dueMileage})',
-                      style: const TextStyle(
-                        fontSize: 12,
-                        fontWeight: FontWeight.w600,
-                        color: AppColors.primaryLight,
+                    Expanded(
+                      child: GestureDetector(
+                        onTap: () => setState(() => _showUpcoming = true),
+                        child: AnimatedContainer(
+                          duration: const Duration(milliseconds: 200),
+                          decoration: BoxDecoration(
+                            color: _showUpcoming
+                                ? AppColors.primaryLight
+                                : Colors.transparent,
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                          child: Center(
+                            child: Text(
+                              'Upcoming',
+                              style: TextStyle(
+                                fontSize: 15,
+                                fontWeight: FontWeight.bold,
+                                color: _showUpcoming
+                                    ? Colors.white
+                                    : (isDark ? AppColors.darkTextSecondary : AppColors.lightTextSecondary),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                    Expanded(
+                      child: GestureDetector(
+                        onTap: () => setState(() => _showUpcoming = false),
+                        child: AnimatedContainer(
+                          duration: const Duration(milliseconds: 200),
+                          decoration: BoxDecoration(
+                            color: !_showUpcoming
+                                ? AppColors.primaryLight
+                                : Colors.transparent,
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                          child: Center(
+                            child: Text(
+                              'Past',
+                              style: TextStyle(
+                                fontSize: 15,
+                                fontWeight: FontWeight.bold,
+                                color: !_showUpcoming
+                                    ? Colors.white
+                                    : (isDark ? AppColors.darkTextSecondary : AppColors.lightTextSecondary),
+                              ),
+                            ),
+                          ),
+                        ),
                       ),
                     ),
                   ],
                 ),
-              ],
-            ),
-            trailing: IconButton(
-              icon: const Icon(Icons.delete_outline, color: AppColors.danger, size: 20),
-              onPressed: () {
-                context.read<ReminderProvider>().deleteReminder(item.id);
-              },
-            ),
+              ),
+              const SizedBox(height: 20),
+
+              // Reminders List
+              if (list.isEmpty)
+                Padding(
+                  padding: const EdgeInsets.all(40),
+                  child: Text(
+                    _showUpcoming ? 'No upcoming reminders' : 'No past reminders',
+                    style: TextStyle(
+                      color: isDark ? AppColors.darkTextSecondary : AppColors.lightTextSecondary,
+                    ),
+                  ),
+                )
+              else
+                ...list.map((item) {
+                  return Container(
+                    margin: const EdgeInsets.only(bottom: 12),
+                    decoration: BoxDecoration(
+                      color: isDark ? AppColors.darkCard : Colors.white,
+                      borderRadius: BorderRadius.circular(16),
+                      border: Border.all(
+                        color: isDark ? AppColors.darkBorder : AppColors.lightBorder,
+                      ),
+                    ),
+                    child: ListTile(
+                      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                      leading: Container(
+                        width: 44,
+                        height: 44,
+                        decoration: BoxDecoration(
+                          color: AppColors.primaryLight.withOpacity(0.12),
+                          shape: BoxShape.circle,
+                        ),
+                        child: const Center(
+                          child: Icon(
+                            Icons.water_drop_rounded,
+                            color: AppColors.primaryLight,
+                            size: 22,
+                          ),
+                        ),
+                      ),
+                      title: Text(
+                        item.title,
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                          color: isDark ? AppColors.darkTextPrimary : AppColors.lightTextPrimary,
+                        ),
+                      ),
+                      subtitle: Padding(
+                        padding: const EdgeInsets.only(top: 4),
+                        child: Text(
+                          'Due in ${item.dueDate}  •  ${item.dueMileage}',
+                          style: TextStyle(
+                            fontSize: 13,
+                            color: isDark ? AppColors.darkTextSecondary : AppColors.lightTextSecondary,
+                          ),
+                        ),
+                      ),
+                      trailing: Icon(
+                        Icons.chevron_right_rounded,
+                        color: isDark ? AppColors.darkTextSecondary : AppColors.lightTextSecondary,
+                      ),
+                    ),
+                  );
+                }),
+
+              const SizedBox(height: 24),
+
+              // Tip Card (Matching Image 2 Screen 9 bottom green tint card)
+              Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: isDark ? AppColors.darkSurface : AppColors.mintBackground,
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(
+                    color: AppColors.primaryLight.withOpacity(0.3),
+                  ),
+                ),
+                child: Row(
+                  children: [
+                    const Icon(
+                      Icons.lightbulb_outline_rounded,
+                      color: AppColors.primaryLight,
+                      size: 28,
+                    ),
+                    const SizedBox(width: 14),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Text(
+                            'Tip',
+                            style: TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.bold,
+                              color: AppColors.primaryLight,
+                            ),
+                          ),
+                          const SizedBox(height: 2),
+                          Text(
+                            'Regular maintenance extends your vehicle\'s life and saves you money!',
+                            style: TextStyle(
+                              fontSize: 13,
+                              color: isDark ? AppColors.darkTextPrimary : AppColors.lightTextPrimary,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
           ),
-        );
-      },
+        ),
+      ),
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: () => _showAddReminderDialog(context),
+        backgroundColor: AppColors.primaryLight,
+        icon: const Icon(Icons.alarm_add, color: Colors.white),
+        label: const Text('Add Reminder', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+      ),
     );
   }
 }
