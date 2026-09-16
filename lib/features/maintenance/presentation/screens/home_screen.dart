@@ -7,6 +7,8 @@ import '../../../reminders/presentation/providers/reminder_provider.dart';
 import '../providers/maintenance_provider.dart';
 import '../widgets/maintenance_card.dart';
 import 'edit_maintenance_screen.dart';
+import 'service_history_screen.dart';
+import '../../../vehicles/presentation/screens/vehicle_details_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   final Function(int)? onNavigateTab;
@@ -185,8 +187,13 @@ class _HomeScreenState extends State<HomeScreen> {
                     // Active Vehicle Banner Card
                     GestureDetector(
                       onTap: () {
-                        if (widget.onNavigateTab != null) {
-                          widget.onNavigateTab!(1); // Go to Vehicles tab
+                        if (activeCar != null) {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => VehicleDetailsScreen(vehicle: activeCar),
+                            ),
+                          );
                         }
                       },
                       child: Container(
@@ -209,19 +216,20 @@ class _HomeScreenState extends State<HomeScreen> {
                         ),
                         child: Row(
                           children: [
-                            // Vehicle Thumbnail / Icon
+                            // Vehicle Thumbnail Photo
                             Container(
-                              width: 60,
-                              height: 60,
+                              width: 68,
+                              height: 52,
                               decoration: BoxDecoration(
-                                color: isDark ? AppColors.darkSurface : AppColors.mintBackground,
-                                borderRadius: BorderRadius.circular(14),
+                                borderRadius: BorderRadius.circular(12),
                               ),
-                              child: const Center(
-                                child: Icon(
-                                  Icons.directions_car_filled_rounded,
-                                  color: AppColors.primaryLight,
-                                  size: 36,
+                              child: ClipRRect(
+                                borderRadius: BorderRadius.circular(12),
+                                child: Image.asset(
+                                  (activeCar != null && activeCar.make.toLowerCase().contains('toyota'))
+                                      ? 'assets/images/toyota_corolla.jpg'
+                                      : 'assets/images/honda_civic.jpg',
+                                  fit: BoxFit.cover,
                                 ),
                               ),
                             ),
@@ -335,8 +343,10 @@ class _HomeScreenState extends State<HomeScreen> {
                         ),
                         TextButton(
                           onPressed: () {
-                            provider.setCategoryFilter('All');
-                            provider.setSearchQuery('');
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(builder: (_) => const ServiceHistoryScreen()),
+                            );
                           },
                           child: const Text(
                             'View all',
