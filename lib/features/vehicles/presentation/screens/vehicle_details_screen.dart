@@ -18,19 +18,16 @@ class VehicleDetailsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final isCorolla = vehicle.make.toLowerCase().contains('toyota');
-    final carAssetPath = isCorolla
-        ? 'assets/images/toyota_corolla.jpg'
-        : 'assets/images/honda_civic.jpg';
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Vehicle Details'),
+        title: Text(vehicle.displayName),
         elevation: 0,
         actions: [
           IconButton(
-            icon: const Icon(Icons.more_vert_rounded),
+            icon: const Icon(Icons.edit_outlined),
             onPressed: () => _showEditDialog(context),
+            tooltip: 'Edit Details',
           ),
         ],
       ),
@@ -40,84 +37,133 @@ class VehicleDetailsScreen extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Vehicle Hero Photo Container
-              Container(
-                width: double.infinity,
-                height: 220,
-                decoration: BoxDecoration(
-                  color: isDark ? AppColors.darkCard : Colors.white,
-                  borderRadius: BorderRadius.circular(24),
-                  border: Border.all(
-                    color: isDark ? AppColors.darkBorder : AppColors.lightBorder,
-                  ),
-                  boxShadow: isDark
-                      ? []
-                      : [
-                          BoxShadow(
-                            color: Colors.black.withOpacity(0.04),
-                            blurRadius: 16,
-                            offset: const Offset(0, 6),
-                          ),
-                        ],
-                ),
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(24),
-                  child: Image.asset(
-                    carAssetPath,
-                    fit: BoxFit.cover,
-                  ),
-                ),
-              ),
-              const SizedBox(height: 20),
-
-              // Title & Badges
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              // Hero Vehicle Photo Container with Badges Overlay
+              Stack(
                 children: [
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        vehicle.displayName,
-                        style: TextStyle(
-                          fontSize: 24,
-                          fontWeight: FontWeight.bold,
-                          color: isDark ? AppColors.darkTextPrimary : AppColors.lightTextPrimary,
-                        ),
+                  Container(
+                    width: double.infinity,
+                    height: 230,
+                    decoration: BoxDecoration(
+                      color: isDark ? AppColors.darkCard : Colors.white,
+                      borderRadius: BorderRadius.circular(24),
+                      border: Border.all(
+                        color: isDark ? AppColors.darkBorder : AppColors.lightBorder,
                       ),
-                      const SizedBox(height: 4),
-                      Text(
-                        '${vehicle.year}  •  ${vehicle.mileage}',
-                        style: TextStyle(
-                          fontSize: 15,
-                          color: isDark ? AppColors.darkTextSecondary : AppColors.lightTextSecondary,
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withValues(alpha: 0.08),
+                          blurRadius: 18,
+                          offset: const Offset(0, 6),
                         ),
+                      ],
+                    ),
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(24),
+                      child: Image.asset(
+                        vehicle.imagePath,
+                        fit: BoxFit.cover,
                       ),
-                    ],
+                    ),
                   ),
-                  if (vehicle.isDefault)
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+
+                  // Overlay Gradient
+                  Positioned.fill(
+                    child: Container(
                       decoration: BoxDecoration(
-                        color: AppColors.primaryLight.withOpacity(0.15),
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: const Text(
-                        'Default',
-                        style: TextStyle(
-                          fontSize: 13,
-                          fontWeight: FontWeight.bold,
-                          color: AppColors.primaryLight,
+                        borderRadius: BorderRadius.circular(24),
+                        gradient: LinearGradient(
+                          begin: Alignment.topCenter,
+                          end: Alignment.bottomCenter,
+                          colors: [
+                            Colors.transparent,
+                            Colors.black.withValues(alpha: 0.75),
+                          ],
+                          stops: const [0.4, 1.0],
                         ),
                       ),
                     ),
+                  ),
+
+                  // Bottom Title & License Plate Overlay
+                  Positioned(
+                    left: 16,
+                    bottom: 16,
+                    right: 16,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      children: [
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Text(
+                                vehicle.displayName,
+                                style: const TextStyle(
+                                  fontSize: 22,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.white,
+                                ),
+                              ),
+                              const SizedBox(height: 2),
+                              Text(
+                                '${vehicle.year}  •  ${vehicle.mileage}  •  ${vehicle.bodyType}',
+                                style: TextStyle(
+                                  fontSize: 13,
+                                  color: Colors.white.withValues(alpha: 0.85),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        if (vehicle.licensePlate.isNotEmpty)
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(8),
+                              border: Border.all(color: Colors.black, width: 1.5),
+                              boxShadow: const [
+                                BoxShadow(color: Colors.black26, blurRadius: 4),
+                              ],
+                            ),
+                            child: Text(
+                              vehicle.licensePlate,
+                              style: const TextStyle(
+                                fontSize: 13,
+                                fontWeight: FontWeight.w900,
+                                letterSpacing: 1.0,
+                                color: Colors.black,
+                              ),
+                            ),
+                          ),
+                      ],
+                    ),
+                  ),
                 ],
+              ),
+              const SizedBox(height: 20),
+
+              // Quick Specs Pills (Drivetrain, HP, Fuel, Transmission)
+              SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: Row(
+                  children: [
+                    _buildQuickBadge(context, Icons.flash_on_rounded, vehicle.horsepower, AppColors.primaryLight),
+                    _buildQuickBadge(context, Icons.grid_view_rounded, vehicle.drivetrain, AppColors.info),
+                    _buildQuickBadge(context, Icons.local_gas_station_rounded, vehicle.fuelType, AppColors.warning),
+                    _buildQuickBadge(context, Icons.tune_rounded, vehicle.transmission, AppColors.accent),
+                  ],
+                ),
               ),
               const SizedBox(height: 24),
 
-              // Specifications Card List (Matching Image 2 Screen 7)
+              // SECTION 1: Engine & Performance
+              _buildSectionTitle(context, '🏎️ Engine & Performance', isDark),
+              const SizedBox(height: 10),
               Container(
-                padding: const EdgeInsets.all(20),
+                padding: const EdgeInsets.all(18),
                 decoration: BoxDecoration(
                   color: isDark ? AppColors.darkCard : Colors.white,
                   borderRadius: BorderRadius.circular(20),
@@ -127,67 +173,161 @@ class VehicleDetailsScreen extends StatelessWidget {
                 ),
                 child: Column(
                   children: [
-                    _buildSpecRow(
-                      context,
-                      icon: Icons.qr_code_rounded,
-                      label: 'VIN',
-                      value: vehicle.vin.isNotEmpty ? vehicle.vin : 'JTDBR32E5LJ001234',
-                      isDark: isDark,
-                    ),
-                    const Divider(height: 24),
-                    _buildSpecRow(
-                      context,
-                      icon: Icons.speed_rounded,
-                      label: 'Engine',
-                      value: '1.8L 4-Cylinder',
-                      isDark: isDark,
-                    ),
-                    const Divider(height: 24),
-                    _buildSpecRow(
-                      context,
-                      icon: Icons.local_gas_station_rounded,
-                      label: 'Fuel Type',
-                      value: vehicle.fuelType,
-                      isDark: isDark,
-                    ),
-                    const Divider(height: 24),
-                    _buildSpecRow(
-                      context,
-                      icon: Icons.tune_rounded,
-                      label: 'Transmission',
-                      value: vehicle.transmission,
-                      isDark: isDark,
-                    ),
+                    _buildSpecRow(context, icon: Icons.speed_rounded, label: 'Engine Size', value: vehicle.engineSize, isDark: isDark),
+                    const Divider(height: 20),
+                    _buildSpecRow(context, icon: Icons.bolt_rounded, label: 'Horsepower', value: vehicle.horsepower, isDark: isDark),
+                    const Divider(height: 20),
+                    _buildSpecRow(context, icon: Icons.rotate_right_rounded, label: 'Torque', value: vehicle.torque, isDark: isDark),
+                    const Divider(height: 20),
+                    _buildSpecRow(context, icon: Icons.alt_route_rounded, label: 'Drivetrain', value: vehicle.drivetrain, isDark: isDark),
+                    const Divider(height: 20),
+                    _buildSpecRow(context, icon: Icons.local_gas_station_outlined, label: 'Fuel / Battery Capacity', value: vehicle.fuelCapacity, isDark: isDark),
                   ],
                 ),
               ),
-              const SizedBox(height: 32),
+              const SizedBox(height: 24),
 
-              // Edit Vehicle Button
+              // SECTION 2: Maintenance Specs
+              _buildSectionTitle(context, '⚙️ Maintenance Specifications', isDark),
+              const SizedBox(height: 10),
+              Container(
+                padding: const EdgeInsets.all(18),
+                decoration: BoxDecoration(
+                  color: isDark ? AppColors.darkCard : Colors.white,
+                  borderRadius: BorderRadius.circular(20),
+                  border: Border.all(
+                    color: isDark ? AppColors.darkBorder : AppColors.lightBorder,
+                  ),
+                ),
+                child: Column(
+                  children: [
+                    _buildSpecRow(context, icon: Icons.opacity_rounded, label: 'Oil Viscosity', value: vehicle.oilType, isDark: isDark),
+                    const Divider(height: 20),
+                    _buildSpecRow(context, icon: Icons.tire_repair_rounded, label: 'Tire Specs', value: vehicle.tireSize, isDark: isDark),
+                    const Divider(height: 20),
+                    _buildSpecRow(context, icon: Icons.store_mall_directory_outlined, label: 'Service Center', value: vehicle.serviceCenter, isDark: isDark),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 24),
+
+              // SECTION 3: Legal & Registration
+              _buildSectionTitle(context, '📄 Legal & Registration', isDark),
+              const SizedBox(height: 10),
+              Container(
+                padding: const EdgeInsets.all(18),
+                decoration: BoxDecoration(
+                  color: isDark ? AppColors.darkCard : Colors.white,
+                  borderRadius: BorderRadius.circular(20),
+                  border: Border.all(
+                    color: isDark ? AppColors.darkBorder : AppColors.lightBorder,
+                  ),
+                ),
+                child: Column(
+                  children: [
+                    _buildSpecRow(context, icon: Icons.fingerprint_rounded, label: 'VIN Number', value: vehicle.vin.isNotEmpty ? vehicle.vin : 'Not Set', isDark: isDark),
+                    const Divider(height: 20),
+                    _buildSpecRow(context, icon: Icons.pin_drop_outlined, label: 'License Plate', value: vehicle.licensePlate.isNotEmpty ? vehicle.licensePlate : 'Not Set', isDark: isDark),
+                    const Divider(height: 20),
+                    _buildSpecRow(context, icon: Icons.security_rounded, label: 'Insurance Co.', value: vehicle.insuranceProvider.isNotEmpty ? vehicle.insuranceProvider : 'Not Set', isDark: isDark),
+                    const Divider(height: 20),
+                    _buildSpecRow(context, icon: Icons.confirmation_number_outlined, label: 'Policy Number', value: vehicle.policyNumber.isNotEmpty ? vehicle.policyNumber : 'Not Set', isDark: isDark),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 24),
+
+              // SECTION 4: Notes (if any)
+              if (vehicle.notes.isNotEmpty) ...[
+                _buildSectionTitle(context, '📝 Notes & Instructions', isDark),
+                const SizedBox(height: 10),
+                Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.all(18),
+                  decoration: BoxDecoration(
+                    color: isDark ? AppColors.darkCard : Colors.white,
+                    borderRadius: BorderRadius.circular(20),
+                    border: Border.all(
+                      color: isDark ? AppColors.darkBorder : AppColors.lightBorder,
+                    ),
+                  ),
+                  child: Text(
+                    vehicle.notes,
+                    style: TextStyle(
+                      fontSize: 14,
+                      height: 1.45,
+                      color: isDark ? AppColors.darkTextPrimary : AppColors.lightTextPrimary,
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 28),
+              ],
+
+              // Edit Vehicle Action Button
               SizedBox(
                 width: double.infinity,
                 height: 54,
-                child: ElevatedButton(
+                child: ElevatedButton.icon(
                   onPressed: () => _showEditDialog(context),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.primaryLight,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(27),
-                    ),
-                  ),
-                  child: const Text(
-                    'Edit Vehicle',
+                  icon: const Icon(Icons.edit_rounded, color: Colors.white),
+                  label: const Text(
+                    'Edit All Vehicle Details',
                     style: TextStyle(
                       fontSize: 17,
                       fontWeight: FontWeight.bold,
                       color: Colors.white,
                     ),
                   ),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppColors.primaryLight,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(27),
+                    ),
+                  ),
                 ),
               ),
+              const SizedBox(height: 24),
             ],
           ),
         ),
+      ),
+    );
+  }
+
+  Widget _buildSectionTitle(BuildContext context, String title, bool isDark) {
+    return Text(
+      title,
+      style: TextStyle(
+        fontSize: 18,
+        fontWeight: FontWeight.bold,
+        color: isDark ? AppColors.darkTextPrimary : AppColors.lightTextPrimary,
+      ),
+    );
+  }
+
+  Widget _buildQuickBadge(BuildContext context, IconData icon, String label, Color color) {
+    return Container(
+      margin: const EdgeInsets.only(right: 10),
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: 0.15),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: color.withValues(alpha: 0.3)),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, size: 16, color: color),
+          const SizedBox(width: 6),
+          Text(
+            label,
+            style: TextStyle(
+              fontSize: 13,
+              fontWeight: FontWeight.bold,
+              color: color,
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -210,17 +350,20 @@ class VehicleDetailsScreen extends StatelessWidget {
         Text(
           label,
           style: TextStyle(
-            fontSize: 15,
+            fontSize: 14,
             color: isDark ? AppColors.darkTextSecondary : AppColors.lightTextSecondary,
           ),
         ),
         const Spacer(),
-        Text(
-          value,
-          style: TextStyle(
-            fontSize: 15,
-            fontWeight: FontWeight.w600,
-            color: isDark ? AppColors.darkTextPrimary : AppColors.lightTextPrimary,
+        Flexible(
+          child: Text(
+            value,
+            textAlign: TextAlign.right,
+            style: TextStyle(
+              fontSize: 14,
+              fontWeight: FontWeight.w600,
+              color: isDark ? AppColors.darkTextPrimary : AppColors.lightTextPrimary,
+            ),
           ),
         ),
       ],
