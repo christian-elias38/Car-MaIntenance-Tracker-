@@ -31,7 +31,7 @@ class ProfileSettingsScreen extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'Settings & Preferences',
+                'Settings & System Appearance',
                 style: TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
@@ -44,17 +44,17 @@ class ProfileSettingsScreen extends StatelessWidget {
               ListTile(
                 contentPadding: EdgeInsets.zero,
                 leading: const Icon(Icons.brightness_6_outlined, color: AppColors.primaryLight),
-                title: const Text('Theme Mode'),
+                title: const Text('Theme Mode & System Colors'),
                 subtitle: Text(
                   themeProvider.themeMode == ThemeMode.system
-                      ? 'System Default'
+                      ? 'System Default ⚙️'
                       : (themeProvider.themeMode == ThemeMode.dark ? 'Dark Mode 🌙' : 'Light Mode ☀️'),
                 ),
                 trailing: DropdownButtonHideUnderline(
                   child: DropdownButton<ThemeMode>(
                     value: themeProvider.themeMode,
                     items: const [
-                      DropdownMenuItem(value: ThemeMode.system, child: Text('System')),
+                      DropdownMenuItem(value: ThemeMode.system, child: Text('System ⚙️')),
                       DropdownMenuItem(value: ThemeMode.light, child: Text('Light ☀️')),
                       DropdownMenuItem(value: ThemeMode.dark, child: Text('Dark 🌙')),
                     ],
@@ -104,18 +104,19 @@ class ProfileSettingsScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final userProvider = context.watch<UserProvider>();
+    final themeProvider = context.watch<ThemeProvider>();
 
     return Scaffold(
       body: SafeArea(
         child: SingleChildScrollView(
           child: Column(
             children: [
-              // Top Forest Green Header Card (Matching Image 2 Screen 11)
+              // Top Forest Green Header Card
               Container(
                 width: double.infinity,
                 padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 30),
                 decoration: const BoxDecoration(
-                  color: Color(0xFF093327), // Deep dark forest green
+                  color: Color(0xFF093327),
                   borderRadius: BorderRadius.vertical(bottom: Radius.circular(28)),
                 ),
                 child: Row(
@@ -125,9 +126,9 @@ class ProfileSettingsScreen extends StatelessWidget {
                       width: 68,
                       height: 68,
                       decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.2),
+                        color: Colors.white.withValues(alpha: 0.2),
                         shape: BoxShape.circle,
-                        border: Border.all(color: Colors.white.withOpacity(0.3), width: 2),
+                        border: Border.all(color: Colors.white.withValues(alpha: 0.3), width: 2),
                       ),
                       child: const Center(
                         child: Icon(
@@ -145,7 +146,7 @@ class ProfileSettingsScreen extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            'Christian Elias',
+                            userProvider.userName,
                             style: const TextStyle(
                               fontSize: 22,
                               fontWeight: FontWeight.bold,
@@ -157,23 +158,84 @@ class ProfileSettingsScreen extends StatelessWidget {
                             userProvider.userEmail,
                             style: TextStyle(
                               fontSize: 14,
-                              color: Colors.white.withOpacity(0.8),
+                              color: Colors.white.withValues(alpha: 0.8),
                             ),
                           ),
                         ],
                       ),
                     ),
-                    Icon(
-                      Icons.chevron_right_rounded,
-                      color: Colors.white.withOpacity(0.8),
-                      size: 28,
-                    ),
                   ],
                 ),
               ),
-              const SizedBox(height: 24),
+              const SizedBox(height: 20),
 
-              // Menu Options Container Card (Matching Image 2 Screen 11)
+              // Theme Quick Selector Segmented Buttons
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20),
+                child: Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: isDark ? AppColors.darkCard : Colors.white,
+                    borderRadius: BorderRadius.circular(20),
+                    border: Border.all(
+                      color: isDark ? AppColors.darkBorder : AppColors.lightBorder,
+                    ),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Appearance & Theme Mode',
+                        style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.bold,
+                          color: isDark ? AppColors.darkTextSecondary : AppColors.lightTextSecondary,
+                        ),
+                      ),
+                      const SizedBox(height: 10),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: _buildThemeSegment(
+                              context,
+                              label: 'System',
+                              icon: Icons.brightness_auto_rounded,
+                              isSelected: themeProvider.themeMode == ThemeMode.system,
+                              onTap: () => themeProvider.setThemeMode(ThemeMode.system),
+                              isDark: isDark,
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          Expanded(
+                            child: _buildThemeSegment(
+                              context,
+                              label: 'Light',
+                              icon: Icons.wb_sunny_rounded,
+                              isSelected: themeProvider.themeMode == ThemeMode.light,
+                              onTap: () => themeProvider.setThemeMode(ThemeMode.light),
+                              isDark: isDark,
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          Expanded(
+                            child: _buildThemeSegment(
+                              context,
+                              label: 'Dark',
+                              icon: Icons.nightlight_round,
+                              isSelected: themeProvider.themeMode == ThemeMode.dark,
+                              onTap: () => themeProvider.setThemeMode(ThemeMode.dark),
+                              isDark: isDark,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              const SizedBox(height: 20),
+
+              // Menu Options Container Card
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 20),
                 child: Container(
@@ -183,22 +245,20 @@ class ProfileSettingsScreen extends StatelessWidget {
                     border: Border.all(
                       color: isDark ? AppColors.darkBorder : AppColors.lightBorder,
                     ),
-                    boxShadow: isDark
-                        ? []
-                        : [
-                            BoxShadow(
-                              color: Colors.black.withOpacity(0.04),
-                              blurRadius: 14,
-                              offset: const Offset(0, 4),
-                            ),
-                          ],
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withValues(alpha: 0.04),
+                        blurRadius: 14,
+                        offset: const Offset(0, 4),
+                      ),
+                    ],
                   ),
                   child: Column(
                     children: [
                       _buildMenuItem(
                         context,
                         icon: Icons.directions_car_rounded,
-                        title: 'My Vehicles',
+                        title: 'My Vehicles & Garage',
                         isDark: isDark,
                         onTap: () => Navigator.push(
                           context,
@@ -263,7 +323,7 @@ class ProfileSettingsScreen extends StatelessWidget {
               ),
               const SizedBox(height: 32),
 
-              // Log Out Button (Red outlined matching Image 2 Screen 11)
+              // Log Out Button
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 20),
                 child: SizedBox(
@@ -298,6 +358,51 @@ class ProfileSettingsScreen extends StatelessWidget {
               const SizedBox(height: 30),
             ],
           ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildThemeSegment(
+    BuildContext context, {
+    required String label,
+    required IconData icon,
+    required bool isSelected,
+    required VoidCallback onTap,
+    required bool isDark,
+  }) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(12),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        padding: const EdgeInsets.symmetric(vertical: 10),
+        decoration: BoxDecoration(
+          color: isSelected
+              ? AppColors.primaryLight
+              : (isDark ? AppColors.darkSurface : AppColors.lightBackground),
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(
+            color: isSelected ? AppColors.primaryLight : Colors.transparent,
+          ),
+        ),
+        child: Column(
+          children: [
+            Icon(
+              icon,
+              size: 20,
+              color: isSelected ? Colors.white : (isDark ? AppColors.darkTextPrimary : AppColors.lightTextPrimary),
+            ),
+            const SizedBox(height: 4),
+            Text(
+              label,
+              style: TextStyle(
+                fontSize: 12,
+                fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                color: isSelected ? Colors.white : (isDark ? AppColors.darkTextPrimary : AppColors.lightTextPrimary),
+              ),
+            ),
+          ],
         ),
       ),
     );
