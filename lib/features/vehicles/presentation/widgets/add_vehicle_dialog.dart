@@ -13,42 +13,111 @@ class AddVehicleDialog extends StatefulWidget {
   State<AddVehicleDialog> createState() => _AddVehicleDialogState();
 }
 
-class _AddVehicleDialogState extends State<AddVehicleDialog> {
+class _AddVehicleDialogState extends State<AddVehicleDialog> with SingleTickerProviderStateMixin {
+  late TabController _tabController;
   final _formKey = GlobalKey<FormState>();
+
+  // Basic Info Controllers
   late TextEditingController _makeController;
   late TextEditingController _modelController;
   late TextEditingController _yearController;
-  late TextEditingController _vinController;
+  late TextEditingController _trimController;
+  late TextEditingController _colorController;
+  late TextEditingController _licensePlateController;
   late TextEditingController _mileageController;
+
+  // Engine & Performance Controllers
+  late TextEditingController _engineSizeController;
+  late TextEditingController _hpController;
+  late TextEditingController _torqueController;
+  late TextEditingController _fuelCapacityController;
+
+  // Legal & Maintenance Controllers
+  late TextEditingController _vinController;
+  late TextEditingController _oilTypeController;
+  late TextEditingController _tireSizeController;
+  late TextEditingController _insuranceProviderController;
+  late TextEditingController _policyNumberController;
+  late TextEditingController _serviceCenterController;
+  late TextEditingController _notesController;
 
   String _fuelType = 'Gasoline';
   String _transmission = 'Automatic';
+  String _drivetrain = 'FWD';
+  String _bodyType = 'Sedan';
+  String _selectedImagePath = 'assets/images/cool_car_landing.jpg';
   bool _isDefault = false;
 
-  final List<String> _fuelTypes = ['Gasoline', 'Diesel', 'Hybrid', 'Electric'];
-  final List<String> _transmissions = ['Automatic', 'Manual'];
+  final List<String> _fuelTypes = ['Gasoline', 'Diesel', 'Hybrid', 'Electric', 'Plug-in Hybrid'];
+  final List<String> _transmissions = ['Automatic', 'Manual', 'CVT', 'Dual-Clutch'];
+  final List<String> _drivetrains = ['FWD', 'RWD', 'AWD', '4WD'];
+  final List<String> _bodyTypes = ['Sedan', 'SUV', 'Coupe', 'Convertible', 'Hatchback', 'Truck', 'Supercar'];
+
+  final List<Map<String, String>> _imagePresets = [
+    {'name': 'Phantom GT', 'path': 'assets/images/cool_car_landing.jpg'},
+    {'name': 'Sport Sedan', 'path': 'assets/images/sport_sedan_red.jpg'},
+    {'name': 'Toyota Corolla', 'path': 'assets/images/toyota_corolla.jpg'},
+    {'name': 'Honda Civic', 'path': 'assets/images/honda_civic.jpg'},
+  ];
 
   @override
   void initState() {
     super.initState();
+    _tabController = TabController(length: 3, vsync: this);
     final v = widget.vehicleToEdit;
+
     _makeController = TextEditingController(text: v?.make ?? '');
     _modelController = TextEditingController(text: v?.model ?? '');
-    _yearController = TextEditingController(text: v != null ? v.year.toString() : '2022');
+    _yearController = TextEditingController(text: v != null ? v.year.toString() : '2024');
+    _trimController = TextEditingController(text: v?.trim ?? '');
+    _colorController = TextEditingController(text: v?.color ?? 'Midnight Black');
+    _licensePlateController = TextEditingController(text: v?.licensePlate ?? '');
+    _mileageController = TextEditingController(text: v?.mileage.replaceAll(RegExp(r'[^0-9]'), '') ?? '15000');
+
+    _engineSizeController = TextEditingController(text: v?.engineSize ?? '2.0L 4-Cylinder');
+    _hpController = TextEditingController(text: v?.horsepower ?? '200 hp');
+    _torqueController = TextEditingController(text: v?.torque ?? '250 Nm');
+    _fuelCapacityController = TextEditingController(text: v?.fuelCapacity ?? '55 L');
+
     _vinController = TextEditingController(text: v?.vin ?? '');
-    _mileageController = TextEditingController(text: v?.mileage.replaceAll(RegExp(r'[^0-9]'), '') ?? '30000');
+    _oilTypeController = TextEditingController(text: v?.oilType ?? '0W-20 Full Synthetic');
+    _tireSizeController = TextEditingController(text: v?.tireSize ?? '225/45 R18');
+    _insuranceProviderController = TextEditingController(text: v?.insuranceProvider ?? '');
+    _policyNumberController = TextEditingController(text: v?.policyNumber ?? '');
+    _serviceCenterController = TextEditingController(text: v?.serviceCenter ?? 'Authorized Center');
+    _notesController = TextEditingController(text: v?.notes ?? '');
+
     _fuelType = v?.fuelType ?? 'Gasoline';
     _transmission = v?.transmission ?? 'Automatic';
+    _drivetrain = v?.drivetrain ?? 'FWD';
+    _bodyType = v?.bodyType ?? 'Sedan';
+    _selectedImagePath = v?.imagePath ?? 'assets/images/cool_car_landing.jpg';
     _isDefault = v?.isDefault ?? false;
   }
 
   @override
   void dispose() {
+    _tabController.dispose();
     _makeController.dispose();
     _modelController.dispose();
     _yearController.dispose();
-    _vinController.dispose();
+    _trimController.dispose();
+    _colorController.dispose();
+    _licensePlateController.dispose();
     _mileageController.dispose();
+
+    _engineSizeController.dispose();
+    _hpController.dispose();
+    _torqueController.dispose();
+    _fuelCapacityController.dispose();
+
+    _vinController.dispose();
+    _oilTypeController.dispose();
+    _tireSizeController.dispose();
+    _insuranceProviderController.dispose();
+    _policyNumberController.dispose();
+    _serviceCenterController.dispose();
+    _notesController.dispose();
     super.dispose();
   }
 
@@ -56,16 +125,34 @@ class _AddVehicleDialogState extends State<AddVehicleDialog> {
     if (!_formKey.currentState!.validate()) return;
 
     final isEdit = widget.vehicleToEdit != null;
+    final mileageText = _mileageController.text.trim();
+
     final vehicle = VehicleModel(
       id: widget.vehicleToEdit?.id ?? '',
       make: _makeController.text.trim(),
       model: _modelController.text.trim(),
-      year: int.tryParse(_yearController.text.trim()) ?? 2022,
+      year: int.tryParse(_yearController.text.trim()) ?? 2024,
+      trim: _trimController.text.trim(),
       vin: _vinController.text.trim(),
-      mileage: '${_mileageController.text.trim()} km',
+      mileage: mileageText.endsWith('km') ? mileageText : '$mileageText km',
       fuelType: _fuelType,
       transmission: _transmission,
       isDefault: _isDefault,
+      bodyType: _bodyType,
+      color: _colorController.text.trim(),
+      licensePlate: _licensePlateController.text.trim(),
+      engineSize: _engineSizeController.text.trim(),
+      horsepower: _hpController.text.trim(),
+      torque: _torqueController.text.trim(),
+      drivetrain: _drivetrain,
+      fuelCapacity: _fuelCapacityController.text.trim(),
+      oilType: _oilTypeController.text.trim(),
+      tireSize: _tireSizeController.text.trim(),
+      insuranceProvider: _insuranceProviderController.text.trim(),
+      policyNumber: _policyNumberController.text.trim(),
+      serviceCenter: _serviceCenterController.text.trim(),
+      notes: _notesController.text.trim(),
+      imagePath: _selectedImagePath,
     );
 
     final provider = context.read<VehicleProvider>();
@@ -84,179 +171,441 @@ class _AddVehicleDialogState extends State<AddVehicleDialog> {
     final isEdit = widget.vehicleToEdit != null;
 
     return Dialog(
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+      insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(28)),
       backgroundColor: isDark ? AppColors.darkCard : Colors.white,
-      child: SingleChildScrollView(
-        padding: const EdgeInsets.all(24),
+      child: Container(
+        constraints: const BoxConstraints(maxWidth: 540, maxHeight: 720),
         child: Form(
           key: _formKey,
           child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    isEdit ? 'Edit Vehicle' : 'Add New Vehicle',
-                    style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                      color: isDark ? AppColors.darkTextPrimary : AppColors.lightTextPrimary,
+              // Modal Header
+              Padding(
+                padding: const EdgeInsets.fromLTRB(20, 20, 16, 12),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Row(
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.all(8),
+                          decoration: BoxDecoration(
+                            color: AppColors.primaryLight.withValues(alpha: 0.15),
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: const Icon(Icons.directions_car_rounded, color: AppColors.primaryLight),
+                        ),
+                        const SizedBox(width: 12),
+                        Text(
+                          isEdit ? 'Edit Specific Details' : 'Add New Vehicle',
+                          style: TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                            color: isDark ? AppColors.darkTextPrimary : AppColors.lightTextPrimary,
+                          ),
+                        ),
+                      ],
                     ),
-                  ),
-                  IconButton(
-                    icon: const Icon(Icons.close),
-                    onPressed: () => Navigator.pop(context),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 16),
-
-              // Make & Model Row
-              Row(
-                children: [
-                  Expanded(
-                    child: TextFormField(
-                      controller: _makeController,
-                      decoration: const InputDecoration(
-                        labelText: 'Make',
-                        hintText: 'e.g. Toyota',
-                      ),
-                      validator: (v) => v == null || v.isEmpty ? 'Required' : null,
+                    IconButton(
+                      icon: const Icon(Icons.close_rounded),
+                      onPressed: () => Navigator.pop(context),
                     ),
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: TextFormField(
-                      controller: _modelController,
-                      decoration: const InputDecoration(
-                        labelText: 'Model',
-                        hintText: 'e.g. Corolla',
-                      ),
-                      validator: (v) => v == null || v.isEmpty ? 'Required' : null,
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 14),
-
-              // Year & Mileage Row
-              Row(
-                children: [
-                  Expanded(
-                    child: TextFormField(
-                      controller: _yearController,
-                      keyboardType: TextInputType.number,
-                      decoration: const InputDecoration(
-                        labelText: 'Year',
-                        hintText: '2022',
-                      ),
-                      validator: (v) => v == null || v.isEmpty ? 'Required' : null,
-                    ),
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: TextFormField(
-                      controller: _mileageController,
-                      keyboardType: TextInputType.number,
-                      decoration: const InputDecoration(
-                        labelText: 'Mileage (km)',
-                        hintText: '45000',
-                      ),
-                      validator: (v) => v == null || v.isEmpty ? 'Required' : null,
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 14),
-
-              // VIN Number
-              TextFormField(
-                controller: _vinController,
-                decoration: const InputDecoration(
-                  labelText: 'VIN Number (optional)',
-                  hintText: 'e.g. 4T1B11HK5LU...',
+                  ],
                 ),
               ),
-              const SizedBox(height: 16),
 
-              // Fuel Type Radio Dropdown
-              Text(
-                'Fuel Type',
-                style: TextStyle(
-                  fontSize: 13,
-                  fontWeight: FontWeight.w600,
-                  color: isDark ? AppColors.darkTextSecondary : AppColors.lightTextSecondary,
+              // Tab Bar for Categories
+              TabBar(
+                controller: _tabController,
+                indicatorColor: AppColors.primaryLight,
+                labelColor: AppColors.primaryLight,
+                unselectedLabelColor: isDark ? AppColors.darkTextSecondary : AppColors.lightTextSecondary,
+                labelStyle: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
+                tabs: const [
+                  Tab(icon: Icon(Icons.info_outline, size: 18), text: '1. Basic'),
+                  Tab(icon: Icon(Icons.speed, size: 18), text: '2. Specs'),
+                  Tab(icon: Icon(Icons.verified_user_outlined, size: 18), text: '3. Legal & Maint.'),
+                ],
+              ),
+              const Divider(height: 1),
+
+              // Tab Bar View Content
+              Expanded(
+                child: TabBarView(
+                  controller: _tabController,
+                  children: [
+                    // TAB 1: BASIC DETAILS
+                    SingleChildScrollView(
+                      padding: const EdgeInsets.all(20),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            children: [
+                              Expanded(
+                                child: TextFormField(
+                                  controller: _makeController,
+                                  decoration: const InputDecoration(labelText: 'Make *', hintText: 'e.g. Porsche'),
+                                  validator: (v) => v == null || v.isEmpty ? 'Required' : null,
+                                ),
+                              ),
+                              const SizedBox(width: 12),
+                              Expanded(
+                                child: TextFormField(
+                                  controller: _modelController,
+                                  decoration: const InputDecoration(labelText: 'Model *', hintText: 'e.g. 911 GT3'),
+                                  validator: (v) => v == null || v.isEmpty ? 'Required' : null,
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 12),
+                          Row(
+                            children: [
+                              Expanded(
+                                child: TextFormField(
+                                  controller: _yearController,
+                                  keyboardType: TextInputType.number,
+                                  decoration: const InputDecoration(labelText: 'Year *', hintText: '2024'),
+                                  validator: (v) => v == null || v.isEmpty ? 'Required' : null,
+                                ),
+                              ),
+                              const SizedBox(width: 12),
+                              Expanded(
+                                child: TextFormField(
+                                  controller: _trimController,
+                                  decoration: const InputDecoration(labelText: 'Trim / Package', hintText: 'e.g. Touring / GT'),
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 12),
+                          Row(
+                            children: [
+                              Expanded(
+                                child: TextFormField(
+                                  controller: _mileageController,
+                                  keyboardType: TextInputType.number,
+                                  decoration: const InputDecoration(labelText: 'Current Odometer (km) *', hintText: '15000'),
+                                  validator: (v) => v == null || v.isEmpty ? 'Required' : null,
+                                ),
+                              ),
+                              const SizedBox(width: 12),
+                              Expanded(
+                                child: TextFormField(
+                                  controller: _licensePlateController,
+                                  decoration: const InputDecoration(labelText: 'License Plate', hintText: 'XYZ-9876'),
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 12),
+                          TextFormField(
+                            controller: _colorController,
+                            decoration: const InputDecoration(labelText: 'Exterior Color', hintText: 'e.g. Midnight Black / Carbon'),
+                          ),
+                          const SizedBox(height: 16),
+                          Text(
+                            'Body Style',
+                            style: TextStyle(
+                              fontSize: 13,
+                              fontWeight: FontWeight.bold,
+                              color: isDark ? AppColors.darkTextSecondary : AppColors.lightTextSecondary,
+                            ),
+                          ),
+                          const SizedBox(height: 6),
+                          Wrap(
+                            spacing: 8,
+                            runSpacing: 6,
+                            children: _bodyTypes.map((type) {
+                              final selected = _bodyType == type;
+                              return ChoiceChip(
+                                label: Text(type),
+                                selected: selected,
+                                selectedColor: AppColors.primaryLight,
+                                onSelected: (val) {
+                                  if (val) setState(() => _bodyType = type);
+                                },
+                              );
+                            }).toList(),
+                          ),
+                          const SizedBox(height: 16),
+                          Text(
+                            'Car Graphic Preset',
+                            style: TextStyle(
+                              fontSize: 13,
+                              fontWeight: FontWeight.bold,
+                              color: isDark ? AppColors.darkTextSecondary : AppColors.lightTextSecondary,
+                            ),
+                          ),
+                          const SizedBox(height: 8),
+                          SizedBox(
+                            height: 60,
+                            child: ListView.builder(
+                              scrollDirection: Axis.horizontal,
+                              itemCount: _imagePresets.length,
+                              itemBuilder: (ctx, i) {
+                                final preset = _imagePresets[i];
+                                final isSel = _selectedImagePath == preset['path'];
+                                return GestureDetector(
+                                  onTap: () => setState(() => _selectedImagePath = preset['path']!),
+                                  child: Container(
+                                    margin: const EdgeInsets.only(right: 12),
+                                    padding: const EdgeInsets.all(4),
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(12),
+                                      border: Border.all(
+                                        color: isSel ? AppColors.primaryLight : Colors.transparent,
+                                        width: 2,
+                                      ),
+                                    ),
+                                    child: ClipRRect(
+                                      borderRadius: BorderRadius.circular(8),
+                                      child: Image.asset(
+                                        preset['path']!,
+                                        width: 70,
+                                        height: 50,
+                                        fit: BoxFit.cover,
+                                      ),
+                                    ),
+                                  ),
+                                );
+                              },
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+
+                    // TAB 2: ENGINE & SPECS
+                    SingleChildScrollView(
+                      padding: const EdgeInsets.all(20),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            children: [
+                              Expanded(
+                                child: TextFormField(
+                                  controller: _engineSizeController,
+                                  decoration: const InputDecoration(labelText: 'Engine / Motor', hintText: '3.0L Twin-Turbo'),
+                                ),
+                              ),
+                              const SizedBox(width: 12),
+                              Expanded(
+                                child: TextFormField(
+                                  controller: _hpController,
+                                  decoration: const InputDecoration(labelText: 'Horsepower (hp)', hintText: '502 hp'),
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 12),
+                          Row(
+                            children: [
+                              Expanded(
+                                child: TextFormField(
+                                  controller: _torqueController,
+                                  decoration: const InputDecoration(labelText: 'Torque (Nm)', hintText: '470 Nm'),
+                                ),
+                              ),
+                              const SizedBox(width: 12),
+                              Expanded(
+                                child: TextFormField(
+                                  controller: _fuelCapacityController,
+                                  decoration: const InputDecoration(labelText: 'Fuel/Battery Capacity', hintText: '64 L / 85 kWh'),
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 16),
+                          Text(
+                            'Fuel / Power Type',
+                            style: TextStyle(
+                              fontSize: 13,
+                              fontWeight: FontWeight.bold,
+                              color: isDark ? AppColors.darkTextSecondary : AppColors.lightTextSecondary,
+                            ),
+                          ),
+                          const SizedBox(height: 6),
+                          Wrap(
+                            spacing: 8,
+                            runSpacing: 6,
+                            children: _fuelTypes.map((type) {
+                              final selected = _fuelType == type;
+                              return ChoiceChip(
+                                label: Text(type),
+                                selected: selected,
+                                selectedColor: AppColors.primaryLight,
+                                onSelected: (val) {
+                                  if (val) setState(() => _fuelType = type);
+                                },
+                              );
+                            }).toList(),
+                          ),
+                          const SizedBox(height: 16),
+                          Text(
+                            'Transmission Type',
+                            style: TextStyle(
+                              fontSize: 13,
+                              fontWeight: FontWeight.bold,
+                              color: isDark ? AppColors.darkTextSecondary : AppColors.lightTextSecondary,
+                            ),
+                          ),
+                          const SizedBox(height: 6),
+                          Wrap(
+                            spacing: 8,
+                            runSpacing: 6,
+                            children: _transmissions.map((trans) {
+                              final selected = _transmission == trans;
+                              return ChoiceChip(
+                                label: Text(trans),
+                                selected: selected,
+                                selectedColor: AppColors.primaryLight,
+                                onSelected: (val) {
+                                  if (val) setState(() => _transmission = trans);
+                                },
+                              );
+                            }).toList(),
+                          ),
+                          const SizedBox(height: 16),
+                          Text(
+                            'Drivetrain Layout',
+                            style: TextStyle(
+                              fontSize: 13,
+                              fontWeight: FontWeight.bold,
+                              color: isDark ? AppColors.darkTextSecondary : AppColors.lightTextSecondary,
+                            ),
+                          ),
+                          const SizedBox(height: 6),
+                          Wrap(
+                            spacing: 8,
+                            children: _drivetrains.map((drive) {
+                              final selected = _drivetrain == drive;
+                              return ChoiceChip(
+                                label: Text(drive),
+                                selected: selected,
+                                selectedColor: AppColors.primaryLight,
+                                onSelected: (val) {
+                                  if (val) setState(() => _drivetrain = drive);
+                                },
+                              );
+                            }).toList(),
+                          ),
+                        ],
+                      ),
+                    ),
+
+                    // TAB 3: LEGAL & MAINTENANCE
+                    SingleChildScrollView(
+                      padding: const EdgeInsets.all(20),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          TextFormField(
+                            controller: _vinController,
+                            decoration: const InputDecoration(
+                              labelText: 'VIN Number',
+                              hintText: '17-digit Vehicle Identification Number',
+                            ),
+                          ),
+                          const SizedBox(height: 12),
+                          Row(
+                            children: [
+                              Expanded(
+                                child: TextFormField(
+                                  controller: _oilTypeController,
+                                  decoration: const InputDecoration(labelText: 'Oil Viscosity', hintText: '0W-20 Full Synth'),
+                                ),
+                              ),
+                              const SizedBox(width: 12),
+                              Expanded(
+                                child: TextFormField(
+                                  controller: _tireSizeController,
+                                  decoration: const InputDecoration(labelText: 'Tire Specification', hintText: '245/35 R20'),
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 12),
+                          Row(
+                            children: [
+                              Expanded(
+                                child: TextFormField(
+                                  controller: _insuranceProviderController,
+                                  decoration: const InputDecoration(labelText: 'Insurance Co.', hintText: 'State Farm'),
+                                ),
+                              ),
+                              const SizedBox(width: 12),
+                              Expanded(
+                                child: TextFormField(
+                                  controller: _policyNumberController,
+                                  decoration: const InputDecoration(labelText: 'Policy Number', hintText: 'POL-12345'),
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 12),
+                          TextFormField(
+                            controller: _serviceCenterController,
+                            decoration: const InputDecoration(labelText: 'Primary Service Center', hintText: 'Apex Hypercar Hub'),
+                          ),
+                          const SizedBox(height: 12),
+                          TextFormField(
+                            controller: _notesController,
+                            maxLines: 2,
+                            decoration: const InputDecoration(labelText: 'Special Notes / Instructions', hintText: 'Custom tuning specs, warranty notes...'),
+                          ),
+                          const SizedBox(height: 12),
+                          SwitchListTile(
+                            contentPadding: EdgeInsets.zero,
+                            title: const Text('Set as Active Default Vehicle'),
+                            thumbColor: WidgetStateProperty.all(AppColors.primaryLight),
+                            value: _isDefault,
+                            onChanged: (val) => setState(() => _isDefault = val),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
                 ),
               ),
-              const SizedBox(height: 6),
-              Wrap(
-                spacing: 8,
-                children: _fuelTypes.map((type) {
-                  final selected = _fuelType == type;
-                  return ChoiceChip(
-                    label: Text(type),
-                    selected: selected,
-                    selectedColor: AppColors.primaryLight,
-                    onSelected: (val) {
-                      if (val) setState(() => _fuelType = type);
-                    },
-                  );
-                }).toList(),
-              ),
-              const SizedBox(height: 14),
 
-              // Transmission Choice
-              Text(
-                'Transmission',
-                style: TextStyle(
-                  fontSize: 13,
-                  fontWeight: FontWeight.w600,
-                  color: isDark ? AppColors.darkTextSecondary : AppColors.lightTextSecondary,
-                ),
-              ),
-              const SizedBox(height: 6),
-              Wrap(
-                spacing: 8,
-                children: _transmissions.map((trans) {
-                  final selected = _transmission == trans;
-                  return ChoiceChip(
-                    label: Text(trans),
-                    selected: selected,
-                    selectedColor: AppColors.primaryLight,
-                    onSelected: (val) {
-                      if (val) setState(() => _transmission = trans);
-                    },
-                  );
-                }).toList(),
-              ),
-              const SizedBox(height: 14),
+              const Divider(height: 1),
 
-              // Set as Default Checkbox
-              SwitchListTile(
-                contentPadding: EdgeInsets.zero,
-                title: const Text('Set as Default Vehicle'),
-                activeColor: AppColors.primaryLight,
-                value: _isDefault,
-                onChanged: (val) => setState(() => _isDefault = val),
-              ),
-              const SizedBox(height: 20),
-
-              // Submit Button
-              SizedBox(
-                width: double.infinity,
-                height: 50,
-                child: ElevatedButton(
-                  onPressed: _submit,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: isDark ? AppColors.primaryLight : AppColors.primary,
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(25)),
-                  ),
-                  child: Text(
-                    isEdit ? 'Update Vehicle' : 'Add Vehicle',
-                    style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white),
-                  ),
+              // Bottom Action Buttons
+              Padding(
+                padding: const EdgeInsets.all(16),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: OutlinedButton(
+                        onPressed: () => Navigator.pop(context),
+                        style: OutlinedButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(vertical: 14),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                        ),
+                        child: const Text('Cancel'),
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      flex: 2,
+                      child: ElevatedButton(
+                        onPressed: _submit,
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: AppColors.primaryLight,
+                          padding: const EdgeInsets.symmetric(vertical: 14),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                        ),
+                        child: Text(
+                          isEdit ? 'Save Changes' : 'Add Vehicle',
+                          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white),
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ],
