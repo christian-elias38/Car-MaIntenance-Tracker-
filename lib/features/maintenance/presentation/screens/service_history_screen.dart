@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../../../core/theme/app_colors.dart';
-import '../../../profile/presentation/providers/user_provider.dart';
 import '../providers/maintenance_provider.dart';
 import '../widgets/maintenance_card.dart';
 import 'edit_maintenance_screen.dart';
