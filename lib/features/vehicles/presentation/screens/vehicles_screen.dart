@@ -50,7 +50,7 @@ class VehiclesScreen extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('My Vehicles'),
+        title: const Text('My Garage & Vehicles'),
         elevation: 0,
         actions: [
           Padding(
@@ -58,7 +58,7 @@ class VehiclesScreen extends StatelessWidget {
             child: Container(
               width: 40,
               height: 40,
-              decoration: BoxDecoration(
+              decoration: const BoxDecoration(
                 color: AppColors.primaryLight,
                 shape: BoxShape.circle,
               ),
@@ -82,22 +82,20 @@ class VehiclesScreen extends StatelessWidget {
               margin: const EdgeInsets.only(bottom: 16),
               decoration: BoxDecoration(
                 color: isDark ? AppColors.darkCard : Colors.white,
-                borderRadius: BorderRadius.circular(20),
+                borderRadius: BorderRadius.circular(22),
                 border: Border.all(
                   color: isActive
                       ? AppColors.primaryLight
                       : (isDark ? AppColors.darkBorder : AppColors.lightBorder),
                   width: isActive ? 2 : 1,
                 ),
-                boxShadow: isDark
-                    ? []
-                    : [
-                        BoxShadow(
-                          color: Colors.black.withOpacity(0.04),
-                          blurRadius: 10,
-                          offset: const Offset(0, 4),
-                        ),
-                      ],
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: 0.04),
+                    blurRadius: 10,
+                    offset: const Offset(0, 4),
+                  ),
+                ],
               ),
               child: InkWell(
                 onTap: () {
@@ -109,24 +107,22 @@ class VehiclesScreen extends StatelessWidget {
                     ),
                   );
                 },
-                borderRadius: BorderRadius.circular(20),
+                borderRadius: BorderRadius.circular(22),
                 child: Padding(
                   padding: const EdgeInsets.all(16),
                   child: Row(
                     children: [
-                      // Car Photo Thumbnail
+                      // Car Thumbnail Photo
                       Container(
-                        width: 72,
-                        height: 56,
+                        width: 84,
+                        height: 64,
                         decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(14),
+                          borderRadius: BorderRadius.circular(16),
                         ),
                         child: ClipRRect(
-                          borderRadius: BorderRadius.circular(14),
+                          borderRadius: BorderRadius.circular(16),
                           child: Image.asset(
-                            vehicle.make.toLowerCase().contains('toyota')
-                                ? 'assets/images/toyota_corolla.jpg'
-                                : 'assets/images/honda_civic.jpg',
+                            vehicle.imagePath,
                             fit: BoxFit.cover,
                           ),
                         ),
@@ -140,24 +136,28 @@ class VehiclesScreen extends StatelessWidget {
                           children: [
                             Row(
                               children: [
-                                Text(
-                                  vehicle.displayName,
-                                  style: TextStyle(
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.bold,
-                                    color: isDark ? AppColors.darkTextPrimary : AppColors.lightTextPrimary,
+                                Expanded(
+                                  child: Text(
+                                    vehicle.displayName,
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: TextStyle(
+                                      fontSize: 17,
+                                      fontWeight: FontWeight.bold,
+                                      color: isDark ? AppColors.darkTextPrimary : AppColors.lightTextPrimary,
+                                    ),
                                   ),
                                 ),
-                                if (vehicle.isDefault) ...[
-                                  const SizedBox(width: 8),
+                                if (isActive) ...[
+                                  const SizedBox(width: 6),
                                   Container(
                                     padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                                     decoration: BoxDecoration(
-                                      color: AppColors.primaryLight.withOpacity(0.15),
+                                      color: AppColors.primaryLight.withValues(alpha: 0.15),
                                       borderRadius: BorderRadius.circular(6),
                                     ),
                                     child: const Text(
-                                      'Default',
+                                      'Active',
                                       style: TextStyle(
                                         fontSize: 11,
                                         fontWeight: FontWeight.bold,
@@ -170,25 +170,27 @@ class VehiclesScreen extends StatelessWidget {
                             ),
                             const SizedBox(height: 4),
                             Text(
-                              '${vehicle.year} • ${vehicle.mileage}',
+                              '${vehicle.year} • ${vehicle.mileage} • ${vehicle.bodyType}',
                               style: TextStyle(
-                                fontSize: 14,
+                                fontSize: 13,
                                 color: isDark ? AppColors.darkTextSecondary : AppColors.lightTextSecondary,
                               ),
                             ),
-                            const SizedBox(height: 4),
-                            Text(
-                              '${vehicle.fuelType} • ${vehicle.transmission}',
-                              style: TextStyle(
-                                fontSize: 12,
-                                color: isDark ? AppColors.darkTextSecondary : AppColors.lightTextSecondary,
-                              ),
+                            const SizedBox(height: 6),
+                            Row(
+                              children: [
+                                _buildMiniBadge(vehicle.horsepower, AppColors.primaryLight),
+                                const SizedBox(width: 6),
+                                _buildMiniBadge(vehicle.drivetrain, AppColors.info),
+                                const SizedBox(width: 6),
+                                _buildMiniBadge(vehicle.fuelType, AppColors.warning),
+                              ],
                             ),
                           ],
                         ),
                       ),
 
-                      // Action menu / Chevron
+                      // Popup Action Menu
                       PopupMenuButton<String>(
                         icon: Icon(
                           Icons.more_vert_rounded,
@@ -232,7 +234,7 @@ class VehiclesScreen extends StatelessWidget {
                               children: [
                                 Icon(Icons.edit_outlined, size: 18),
                                 SizedBox(width: 8),
-                                Text('Edit Details'),
+                                Text('Edit All Specific Details'),
                               ],
                             ),
                           ),
@@ -259,9 +261,27 @@ class VehiclesScreen extends StatelessWidget {
       ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () => _showAddDialog(context),
-        backgroundColor: isDark ? AppColors.primaryLight : AppColors.primary,
+        backgroundColor: AppColors.primaryLight,
         icon: const Icon(Icons.add, color: Colors.white),
         label: const Text('Add Vehicle', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+      ),
+    );
+  }
+
+  Widget _buildMiniBadge(String label, Color color) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: 0.12),
+        borderRadius: BorderRadius.circular(4),
+      ),
+      child: Text(
+        label,
+        style: TextStyle(
+          fontSize: 10,
+          fontWeight: FontWeight.bold,
+          color: color,
+        ),
       ),
     );
   }
