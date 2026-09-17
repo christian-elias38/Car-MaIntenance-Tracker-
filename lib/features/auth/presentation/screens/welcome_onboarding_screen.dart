@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../../../core/theme/app_colors.dart';
+import '../../../../core/theme/theme_provider.dart';
 import '../../../profile/presentation/providers/user_provider.dart';
+import '../widgets/animated_car_background.dart';
 import 'login_screen.dart';
 
 class WelcomeOnboardingScreen extends StatefulWidget {
@@ -17,19 +19,19 @@ class _WelcomeOnboardingScreenState extends State<WelcomeOnboardingScreen> {
 
   final List<Map<String, String>> _pages = [
     {
-      'title': "Stay on Top of Your Car's Health",
-      'subtitle': 'Get reminders, track services, manage costs and keep your vehicle running smoothly.',
-      'image': 'assets/images/car_onboarding.jpg',
+      'title': "Welcome to CarTrack",
+      'subtitle': 'Experience the futuristic way to monitor your vehicles, track performance, and master maintenance.',
+      'badge': 'HYPERCARE GARAGE',
     },
     {
-      'title': 'Track Maintenance & Expenses',
-      'subtitle': 'Log oil changes, tire rotations, brake checks, and view simple expense reports anytime.',
-      'image': 'assets/images/car_onboarding.jpg',
+      'title': 'Detailed Specifications & Specs',
+      'subtitle': 'Log engine hp, drivetrain, VIN, oil viscosity, tire specs, and insurance details with precision.',
+      'badge': 'FULL SPECIFICATIONS',
     },
     {
-      'title': 'Smart Service Reminders',
-      'subtitle': 'Never miss an upcoming oil change or vehicle inspection with automated reminders.',
-      'image': 'assets/images/car_onboarding.jpg',
+      'title': 'Smart Service & Cost Analytics',
+      'subtitle': 'Receive timely automated reminders, manage service history, and control fuel expenses seamlessly.',
+      'badge': 'PREDICTIVE CARE',
     },
   ];
 
@@ -43,157 +45,231 @@ class _WelcomeOnboardingScreenState extends State<WelcomeOnboardingScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final themeProvider = context.watch<ThemeProvider>();
 
     return Scaffold(
-      body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-          child: Column(
-            children: [
-              // Top Bar with Skip Button
-              Align(
-                alignment: Alignment.topRight,
-                child: TextButton(
-                  onPressed: _onFinish,
-                  child: Text(
-                    'Skip',
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w600,
-                      color: isDark ? AppColors.darkTextSecondary : AppColors.lightTextSecondary,
-                    ),
-                  ),
-                ),
-              ),
-
-              // Page View Illustration & Content
-              Expanded(
-                child: PageView.builder(
-                  controller: _pageController,
-                  onPageChanged: (index) {
-                    setState(() => _currentPage = index);
-                  },
-                  itemCount: _pages.length,
-                  itemBuilder: (context, index) {
-                    final item = _pages[index];
-                    return SingleChildScrollView(
-                      physics: const ClampingScrollPhysics(),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
+      body: AnimatedCarBackground(
+        child: SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+            child: Column(
+              children: [
+                // Top Action Bar: Theme Mode Selector + Skip Button
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    // Quick Theme Toggle Button Chip (System, Light, Dark)
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                      decoration: BoxDecoration(
+                        color: Colors.black.withValues(alpha: 0.45),
+                        borderRadius: BorderRadius.circular(20),
+                        border: Border.all(color: Colors.white.withValues(alpha: 0.2)),
+                      ),
+                      child: Row(
                         children: [
-                          // Hero Image Circle Container
-                          Container(
-                            width: 220,
-                            height: 220,
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              color: isDark ? AppColors.darkSurface : AppColors.mintBackground,
-                              boxShadow: [
-                                BoxShadow(
-                                  color: AppColors.primary.withOpacity(0.08),
-                                  blurRadius: 25,
-                                  offset: const Offset(0, 10),
-                                ),
-                              ],
+                          IconButton(
+                            iconSize: 18,
+                            padding: EdgeInsets.zero,
+                            constraints: const BoxConstraints(),
+                            icon: Icon(
+                              themeProvider.themeMode == ThemeMode.light
+                                  ? Icons.wb_sunny_rounded
+                                  : (themeProvider.themeMode == ThemeMode.dark
+                                      ? Icons.nightlight_round
+                                      : Icons.brightness_auto_rounded),
+                              color: AppColors.primaryLight,
                             ),
-                            child: ClipOval(
-                              child: Image.asset(
-                                item['image']!,
-                                fit: BoxFit.cover,
-                              ),
-                            ),
+                            onPressed: () {
+                              if (themeProvider.themeMode == ThemeMode.system) {
+                                themeProvider.setThemeMode(ThemeMode.dark);
+                              } else if (themeProvider.themeMode == ThemeMode.dark) {
+                                themeProvider.setThemeMode(ThemeMode.light);
+                              } else {
+                                themeProvider.setThemeMode(ThemeMode.system);
+                              }
+                            },
                           ),
-                          const SizedBox(height: 20),
-
-                          // Title
+                          const SizedBox(width: 6),
                           Text(
-                            item['title']!,
-                            textAlign: TextAlign.center,
-                            style: TextStyle(
-                              fontSize: 22,
+                            themeProvider.themeMode == ThemeMode.system
+                                ? 'System'
+                                : (themeProvider.themeMode == ThemeMode.dark ? 'Dark' : 'Light'),
+                            style: const TextStyle(
+                              fontSize: 12,
                               fontWeight: FontWeight.bold,
-                              height: 1.25,
-                              color: isDark ? AppColors.darkTextPrimary : AppColors.lightTextPrimary,
-                            ),
-                          ),
-                          const SizedBox(height: 10),
-
-                          // Subtitle
-                          Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 16),
-                            child: Text(
-                              item['subtitle']!,
-                              textAlign: TextAlign.center,
-                              style: TextStyle(
-                                fontSize: 14,
-                                height: 1.4,
-                                color: isDark ? AppColors.darkTextSecondary : AppColors.lightTextSecondary,
-                              ),
+                              color: Colors.white,
                             ),
                           ),
                         ],
                       ),
-                    );
-                  },
-                ),
-              ),
-
-              // Dots indicator
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: List.generate(
-                  _pages.length,
-                  (idx) => AnimatedContainer(
-                    duration: const Duration(milliseconds: 300),
-                    margin: const EdgeInsets.symmetric(horizontal: 4),
-                    width: _currentPage == idx ? 24 : 8,
-                    height: 8,
-                    decoration: BoxDecoration(
-                      color: _currentPage == idx
-                          ? AppColors.primaryLight
-                          : (isDark ? AppColors.darkBorder : Colors.grey[300]),
-                      borderRadius: BorderRadius.circular(4),
                     ),
-                  ),
-                ),
-              ),
-              const SizedBox(height: 30),
 
-              // Get Started Button
-              SizedBox(
-                width: double.infinity,
-                height: 54,
-                child: ElevatedButton(
-                  onPressed: () {
-                    if (_currentPage < _pages.length - 1) {
-                      _pageController.nextPage(
-                        duration: const Duration(milliseconds: 300),
-                        curve: Curves.easeInOut,
+                    TextButton(
+                      onPressed: _onFinish,
+                      child: const Text(
+                        'Skip',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.white70,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+
+                const Spacer(),
+
+                // Hero Car Glassmorphic Page Content Card
+                SizedBox(
+                  height: 320,
+                  child: PageView.builder(
+                    controller: _pageController,
+                    onPageChanged: (index) {
+                      setState(() => _currentPage = index);
+                    },
+                    itemCount: _pages.length,
+                    itemBuilder: (context, index) {
+                      final item = _pages[index];
+                      return Container(
+                        margin: const EdgeInsets.symmetric(horizontal: 4),
+                        padding: const EdgeInsets.all(24),
+                        decoration: BoxDecoration(
+                          color: Colors.black.withValues(alpha: 0.55),
+                          borderRadius: BorderRadius.circular(28),
+                          border: Border.all(
+                            color: AppColors.primaryLight.withValues(alpha: 0.4),
+                            width: 1.5,
+                          ),
+                          boxShadow: [
+                            BoxShadow(
+                              color: AppColors.primaryLight.withValues(alpha: 0.15),
+                              blurRadius: 30,
+                              spreadRadius: 2,
+                            ),
+                          ],
+                        ),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            // Badge Tag
+                            Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+                              decoration: BoxDecoration(
+                                color: AppColors.primaryLight.withValues(alpha: 0.25),
+                                borderRadius: BorderRadius.circular(20),
+                                border: Border.all(color: AppColors.primaryLight),
+                              ),
+                              child: Text(
+                                item['badge']!,
+                                style: const TextStyle(
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.w800,
+                                  letterSpacing: 1.2,
+                                  color: AppColors.accent,
+                                ),
+                              ),
+                            ),
+                            const SizedBox(height: 16),
+
+                            // Title
+                            Text(
+                              item['title']!,
+                              textAlign: TextAlign.center,
+                              style: const TextStyle(
+                                fontSize: 24,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white,
+                                height: 1.25,
+                              ),
+                            ),
+                            const SizedBox(height: 12),
+
+                            // Subtitle
+                            Text(
+                              item['subtitle']!,
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                fontSize: 14,
+                                height: 1.45,
+                                color: Colors.white.withValues(alpha: 0.85),
+                              ),
+                            ),
+                          ],
+                        ),
                       );
-                    } else {
-                      _onFinish();
-                    }
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.primaryLight,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(27),
-                    ),
-                    elevation: 2,
+                    },
                   ),
-                  child: Text(
-                    _currentPage == _pages.length - 1 ? 'Get Started' : 'Continue',
-                    style: const TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
+                ),
+
+                const SizedBox(height: 24),
+
+                // Dots indicator
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: List.generate(
+                    _pages.length,
+                    (idx) => AnimatedContainer(
+                      duration: const Duration(milliseconds: 300),
+                      margin: const EdgeInsets.symmetric(horizontal: 4),
+                      width: _currentPage == idx ? 28 : 8,
+                      height: 8,
+                      decoration: BoxDecoration(
+                        color: _currentPage == idx
+                            ? AppColors.accent
+                            : Colors.white.withValues(alpha: 0.3),
+                        borderRadius: BorderRadius.circular(4),
+                      ),
                     ),
                   ),
                 ),
-              ),
-              const SizedBox(height: 16),
-            ],
+
+                const Spacer(),
+
+                // Get Started / Continue Button
+                SizedBox(
+                  width: double.infinity,
+                  height: 56,
+                  child: ElevatedButton(
+                    onPressed: () {
+                      if (_currentPage < _pages.length - 1) {
+                        _pageController.nextPage(
+                          duration: const Duration(milliseconds: 300),
+                          curve: Curves.easeInOut,
+                        );
+                      } else {
+                        _onFinish();
+                      }
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppColors.primaryLight,
+                      foregroundColor: Colors.white,
+                      elevation: 8,
+                      shadowColor: AppColors.primaryLight.withValues(alpha: 0.5),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(28),
+                      ),
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          _currentPage == _pages.length - 1 ? 'Get Started' : 'Continue',
+                          style: const TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        const Icon(Icons.arrow_forward_rounded, size: 22),
+                      ],
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 16),
+              ],
+            ),
           ),
         ),
       ),
