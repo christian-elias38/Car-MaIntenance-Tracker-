@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../../../core/theme/app_colors.dart';
+import '../../../../core/theme/theme_provider.dart';
 import '../../../profile/presentation/providers/user_provider.dart';
 import '../../../vehicles/presentation/providers/vehicle_provider.dart';
 import '../../../reminders/presentation/providers/reminder_provider.dart';
@@ -73,6 +74,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final themeProvider = context.watch<ThemeProvider>();
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final userProvider = context.watch<UserProvider>();
     final vehicleProvider = context.watch<VehicleProvider>();
@@ -95,7 +97,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // Header Row: Good evening, User 👋 + Actions
+                    // Header Row: Good evening + Theme Toggle + Actions
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
@@ -122,6 +124,40 @@ class _HomeScreenState extends State<HomeScreen> {
                         ),
                         Row(
                           children: [
+                            // Quick Theme Mode Toggle Button (Light / Dark / System)
+                            Container(
+                              decoration: BoxDecoration(
+                                color: isDark ? AppColors.darkSurface : AppColors.lightSurface,
+                                shape: BoxShape.circle,
+                                border: Border.all(
+                                  color: isDark ? AppColors.darkBorder : AppColors.lightBorder,
+                                ),
+                              ),
+                              child: IconButton(
+                                tooltip: 'Toggle Theme (Dark / Light / System)',
+                                icon: Icon(
+                                  themeProvider.themeMode == ThemeMode.light
+                                      ? Icons.wb_sunny_rounded
+                                      : (themeProvider.themeMode == ThemeMode.dark
+                                          ? Icons.nightlight_round
+                                          : Icons.brightness_auto_rounded),
+                                  size: 22,
+                                  color: AppColors.primaryLight,
+                                ),
+                                onPressed: () {
+                                  if (themeProvider.themeMode == ThemeMode.system) {
+                                    themeProvider.setThemeMode(ThemeMode.dark);
+                                  } else if (themeProvider.themeMode == ThemeMode.dark) {
+                                    themeProvider.setThemeMode(ThemeMode.light);
+                                  } else {
+                                    themeProvider.setThemeMode(ThemeMode.system);
+                                  }
+                                },
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+
+                            // Notification Icon
                             Container(
                               decoration: BoxDecoration(
                                 color: isDark ? AppColors.darkSurface : AppColors.lightSurface,
@@ -136,7 +172,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                     icon: const Icon(Icons.notifications_none_outlined, size: 24),
                                     onPressed: () {
                                       if (widget.onNavigateTab != null) {
-                                        widget.onNavigateTab!(3); // Navigate to Reminders
+                                        widget.onNavigateTab!(3);
                                       }
                                     },
                                   ),
@@ -155,25 +191,27 @@ class _HomeScreenState extends State<HomeScreen> {
                                 ],
                               ),
                             ),
-                            const SizedBox(width: 10),
+                            const SizedBox(width: 8),
+
+                            // Profile Avatar
                             GestureDetector(
                               onTap: () {
                                 if (widget.onNavigateTab != null) {
-                                  widget.onNavigateTab!(4); // Navigate to Profile
+                                  widget.onNavigateTab!(4);
                                 }
                               },
                               child: Container(
-                                width: 44,
-                                height: 44,
+                                width: 42,
+                                height: 42,
                                 decoration: BoxDecoration(
-                                  color: AppColors.primaryLight.withOpacity(0.2),
+                                  color: AppColors.primaryLight.withValues(alpha: 0.2),
                                   shape: BoxShape.circle,
                                   border: Border.all(color: AppColors.primaryLight, width: 2),
                                 ),
                                 child: const Center(
                                   child: Text(
                                     '👨‍💼',
-                                    style: TextStyle(fontSize: 22),
+                                    style: TextStyle(fontSize: 20),
                                   ),
                                 ),
                               ),
@@ -200,35 +238,31 @@ class _HomeScreenState extends State<HomeScreen> {
                         padding: const EdgeInsets.all(16),
                         decoration: BoxDecoration(
                           color: isDark ? AppColors.darkCard : Colors.white,
-                          borderRadius: BorderRadius.circular(20),
+                          borderRadius: BorderRadius.circular(22),
                           border: Border.all(
                             color: isDark ? AppColors.darkBorder : AppColors.lightBorder,
                           ),
-                          boxShadow: isDark
-                              ? []
-                              : [
-                                  BoxShadow(
-                                    color: Colors.black.withOpacity(0.04),
-                                    blurRadius: 12,
-                                    offset: const Offset(0, 4),
-                                  ),
-                                ],
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withValues(alpha: 0.04),
+                              blurRadius: 12,
+                              offset: const Offset(0, 4),
+                            ),
+                          ],
                         ),
                         child: Row(
                           children: [
                             // Vehicle Thumbnail Photo
                             Container(
-                              width: 68,
-                              height: 52,
+                              width: 76,
+                              height: 58,
                               decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(12),
+                                borderRadius: BorderRadius.circular(14),
                               ),
                               child: ClipRRect(
-                                borderRadius: BorderRadius.circular(12),
+                                borderRadius: BorderRadius.circular(14),
                                 child: Image.asset(
-                                  (activeCar != null && activeCar.make.toLowerCase().contains('toyota'))
-                                      ? 'assets/images/toyota_corolla.jpg'
-                                      : 'assets/images/honda_civic.jpg',
+                                  activeCar?.imagePath ?? 'assets/images/cool_car_landing.jpg',
                                   fit: BoxFit.cover,
                                 ),
                               ),
@@ -239,7 +273,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text(
-                                    activeCar?.titleWithYear ?? 'Toyota Corolla (2020)',
+                                    activeCar?.titleWithYear ?? 'Phantom Aero GT (2024)',
                                     style: TextStyle(
                                       fontSize: 17,
                                       fontWeight: FontWeight.bold,
@@ -252,11 +286,11 @@ class _HomeScreenState extends State<HomeScreen> {
                                       Container(
                                         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                                         decoration: BoxDecoration(
-                                          color: AppColors.primaryLight.withOpacity(0.12),
+                                          color: AppColors.primaryLight.withValues(alpha: 0.15),
                                           borderRadius: BorderRadius.circular(6),
                                         ),
                                         child: Text(
-                                          activeCar?.mileage ?? '45,230 km',
+                                          activeCar?.mileage ?? '12,500 km',
                                           style: const TextStyle(
                                             fontSize: 12,
                                             fontWeight: FontWeight.bold,
@@ -266,9 +300,10 @@ class _HomeScreenState extends State<HomeScreen> {
                                       ),
                                       const SizedBox(width: 8),
                                       Text(
-                                        activeCar?.fuelType ?? 'Gasoline',
+                                        '${activeCar?.horsepower ?? '850 hp'} • ${activeCar?.drivetrain ?? 'AWD'}',
                                         style: TextStyle(
                                           fontSize: 12,
+                                          fontWeight: FontWeight.w500,
                                           color: isDark ? AppColors.darkTextSecondary : AppColors.lightTextSecondary,
                                         ),
                                       ),
@@ -288,7 +323,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                     const SizedBox(height: 20),
 
-                    // 4 Stat Overview Grid (Matching design mockup #4)
+                    // 4 Stat Overview Grid
                     GridView.count(
                       crossAxisCount: 2,
                       shrinkWrap: true,
@@ -394,7 +429,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                     const SizedBox(height: 16),
 
-                    // Loading State / Error State / Maintenance Records List
+                    // Maintenance Records List
                     if (provider.isLoading && provider.records.isEmpty)
                       const Padding(
                         padding: EdgeInsets.all(40),
@@ -509,15 +544,13 @@ class _HomeScreenState extends State<HomeScreen> {
         border: Border.all(
           color: isDark ? AppColors.darkBorder : AppColors.lightBorder,
         ),
-        boxShadow: isDark
-            ? []
-            : [
-                BoxShadow(
-                  color: Colors.black.withOpacity(0.02),
-                  blurRadius: 8,
-                  offset: const Offset(0, 3),
-                ),
-              ],
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.02),
+            blurRadius: 8,
+            offset: const Offset(0, 3),
+          ),
+        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -528,7 +561,7 @@ class _HomeScreenState extends State<HomeScreen> {
               Container(
                 padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
-                  color: AppColors.primaryLight.withOpacity(0.12),
+                  color: AppColors.primaryLight.withValues(alpha: 0.12),
                   borderRadius: BorderRadius.circular(10),
                 ),
                 child: Icon(
