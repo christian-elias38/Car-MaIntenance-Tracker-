@@ -57,7 +57,8 @@ class SplashCoverScreen extends StatelessWidget {
                         decoration: BoxDecoration(
                           color: AppColors.primaryLight.withValues(alpha: 0.2),
                           shape: BoxShape.circle,
-                          border: Border.all(color: AppColors.primaryLight, width: 2),
+                          border: Border.all(
+                              color: AppColors.primaryLight, width: 2),
                         ),
                         child: const Center(
                           child: Icon(
@@ -109,12 +110,15 @@ class SplashCoverScreen extends StatelessWidget {
                             if (userProvider.hasCompletedOnboarding) {
                               Navigator.pushReplacement(
                                 context,
-                                MaterialPageRoute(builder: (_) => const MainScreen()),
+                                MaterialPageRoute(
+                                    builder: (_) => const MainScreen()),
                               );
                             } else {
                               Navigator.pushReplacement(
                                 context,
-                                MaterialPageRoute(builder: (_) => const WelcomeOnboardingScreen()),
+                                MaterialPageRoute(
+                                    builder: (_) =>
+                                        const WelcomeOnboardingScreen()),
                               );
                             }
                           },
