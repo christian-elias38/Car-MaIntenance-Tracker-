@@ -41,7 +41,8 @@ class AppTheme {
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
         fillColor: Colors.white,
-        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+        contentPadding:
+            const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
         hintStyle: const TextStyle(color: AppColors.lightTextSecondary),
         labelStyle: const TextStyle(color: AppColors.lightTextSecondary),
         prefixIconColor: AppColors.primary,
@@ -125,7 +126,8 @@ class AppTheme {
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
         fillColor: AppColors.darkSurface,
-        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+        contentPadding:
+            const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
         hintStyle: const TextStyle(color: AppColors.darkTextSecondary),
         labelStyle: const TextStyle(color: AppColors.darkTextSecondary),
         prefixIconColor: AppColors.primaryLight,
