@@ -23,12 +23,12 @@ class _AddMaintenanceScreenState extends State<AddMaintenanceScreen> {
   String _selectedCategory = 'Oil Change';
 
   final List<Map<String, dynamic>> _serviceCategories = [
-    {'name': 'Oil Change', 'icon': Icons.water_drop_rounded, 'color': Color(0xFF0EA5E9)},
-    {'name': 'Tire Rotation', 'icon': Icons.adjust_rounded, 'color': Color(0xFF8B5CF6)},
-    {'name': 'Brake Service', 'icon': Icons.disc_full_rounded, 'color': Color(0xFFF59E0B)},
-    {'name': 'Engine Check', 'icon': Icons.minor_crash_rounded, 'color': Color(0xFFEF4444)},
-    {'name': 'Battery', 'icon': Icons.battery_charging_full_rounded, 'color': Color(0xFF10B981)},
-    {'name': 'Other', 'icon': Icons.more_horiz_rounded, 'color': Color(0xFF64748B)},
+    {'name': 'Oil Change', 'icon': Icons.water_drop_rounded, 'color': const Color(0xFF0EA5E9)},
+    {'name': 'Tire Rotation', 'icon': Icons.adjust_rounded, 'color': const Color(0xFF8B5CF6)},
+    {'name': 'Brake Service', 'icon': Icons.disc_full_rounded, 'color': const Color(0xFFF59E0B)},
+    {'name': 'Engine Check', 'icon': Icons.minor_crash_rounded, 'color': const Color(0xFFEF4444)},
+    {'name': 'Battery', 'icon': Icons.battery_charging_full_rounded, 'color': const Color(0xFF10B981)},
+    {'name': 'Other', 'icon': Icons.more_horiz_rounded, 'color': const Color(0xFF64748B)},
   ];
 
   @override
@@ -255,7 +255,7 @@ class _AddMaintenanceScreenState extends State<AddMaintenanceScreen> {
                                 height: 38,
                                 decoration: BoxDecoration(
                                   color: isSelected
-                                      ? AppColors.primaryLight.withOpacity(0.2)
+                                      ? AppColors.primaryLight.withValues(alpha: 0.2)
                                       : (isDark ? AppColors.darkBackground : AppColors.lightBackground),
                                   shape: BoxShape.circle,
                                 ),
