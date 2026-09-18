@@ -13,7 +13,8 @@ class FuelCostsScreen extends StatelessWidget {
     final userProvider = context.watch<UserProvider>();
     final maintenanceProvider = context.watch<MaintenanceProvider>();
 
-    final totalSpentFormatted = '${userProvider.currency}${maintenanceProvider.totalSpent.toStringAsFixed(0)}';
+    final totalSpentFormatted =
+        '${userProvider.currency}${maintenanceProvider.totalSpent.toStringAsFixed(0)}';
 
     // Monthly data for chart (Nov, Dec, Jan, Feb, Mar, Apr)
     final months = ['Nov', 'Dec', 'Jan', 'Feb', 'Mar', 'Apr'];
@@ -37,7 +38,8 @@ class FuelCostsScreen extends StatelessWidget {
                   color: isDark ? AppColors.darkCard : Colors.white,
                   borderRadius: BorderRadius.circular(20),
                   border: Border.all(
-                    color: isDark ? AppColors.darkBorder : AppColors.lightBorder,
+                    color:
+                        isDark ? AppColors.darkBorder : AppColors.lightBorder,
                   ),
                 ),
                 child: Column(
@@ -53,7 +55,9 @@ class FuelCostsScreen extends StatelessWidget {
                               'Total Spent',
                               style: TextStyle(
                                 fontSize: 14,
-                                color: isDark ? AppColors.darkTextSecondary : AppColors.lightTextSecondary,
+                                color: isDark
+                                    ? AppColors.darkTextSecondary
+                                    : AppColors.lightTextSecondary,
                               ),
                             ),
                             const SizedBox(height: 4),
@@ -62,7 +66,9 @@ class FuelCostsScreen extends StatelessWidget {
                               style: TextStyle(
                                 fontSize: 30,
                                 fontWeight: FontWeight.bold,
-                                color: isDark ? AppColors.darkTextPrimary : AppColors.lightTextPrimary,
+                                color: isDark
+                                    ? AppColors.darkTextPrimary
+                                    : AppColors.lightTextPrimary,
                               ),
                             ),
                           ],
@@ -70,7 +76,8 @@ class FuelCostsScreen extends StatelessWidget {
                         Container(
                           padding: const EdgeInsets.all(12),
                           decoration: BoxDecoration(
-                            color: AppColors.primaryLight.withValues(alpha: 0.12),
+                            color:
+                                AppColors.primaryLight.withValues(alpha: 0.12),
                             borderRadius: BorderRadius.circular(14),
                           ),
                           child: const Icon(
@@ -106,7 +113,9 @@ class FuelCostsScreen extends StatelessWidget {
                                 months[idx],
                                 style: TextStyle(
                                   fontSize: 12,
-                                  color: isDark ? AppColors.darkTextSecondary : AppColors.lightTextSecondary,
+                                  color: isDark
+                                      ? AppColors.darkTextSecondary
+                                      : AppColors.lightTextSecondary,
                                 ),
                               ),
                             ],
@@ -128,7 +137,9 @@ class FuelCostsScreen extends StatelessWidget {
                     style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
-                      color: isDark ? AppColors.darkTextPrimary : AppColors.lightTextPrimary,
+                      color: isDark
+                          ? AppColors.darkTextPrimary
+                          : AppColors.lightTextPrimary,
                     ),
                   ),
                   TextButton(
@@ -154,7 +165,8 @@ class FuelCostsScreen extends StatelessWidget {
                     color: isDark ? AppColors.darkCard : Colors.white,
                     borderRadius: BorderRadius.circular(16),
                     border: Border.all(
-                      color: isDark ? AppColors.darkBorder : AppColors.lightBorder,
+                      color:
+                          isDark ? AppColors.darkBorder : AppColors.lightBorder,
                     ),
                   ),
                   child: Row(
@@ -184,7 +196,9 @@ class FuelCostsScreen extends StatelessWidget {
                               style: TextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.bold,
-                                color: isDark ? AppColors.darkTextPrimary : AppColors.lightTextPrimary,
+                                color: isDark
+                                    ? AppColors.darkTextPrimary
+                                    : AppColors.lightTextPrimary,
                               ),
                             ),
                             const SizedBox(height: 2),
@@ -192,7 +206,9 @@ class FuelCostsScreen extends StatelessWidget {
                               record.date,
                               style: TextStyle(
                                 fontSize: 13,
-                                color: isDark ? AppColors.darkTextSecondary : AppColors.lightTextSecondary,
+                                color: isDark
+                                    ? AppColors.darkTextSecondary
+                                    : AppColors.lightTextSecondary,
                               ),
                             ),
                           ],
@@ -203,7 +219,9 @@ class FuelCostsScreen extends StatelessWidget {
                         style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.bold,
-                          color: isDark ? AppColors.darkTextPrimary : AppColors.lightTextPrimary,
+                          color: isDark
+                              ? AppColors.darkTextPrimary
+                              : AppColors.lightTextPrimary,
                         ),
                       ),
                     ],
