@@ -53,9 +53,9 @@ class _LoginScreenState extends State<LoginScreen> {
                   width: 90,
                   height: 90,
                   decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.12),
+                    color: Colors.white.withValues(alpha: 0.12),
                     shape: BoxShape.circle,
-                    border: Border.all(color: Colors.white.withOpacity(0.2), width: 2),
+                    border: Border.all(color: Colors.white.withValues(alpha: 0.2), width: 2),
                   ),
                   child: const Center(
                     child: Icon(Icons.directions_car_rounded, size: 50, color: Colors.white),
@@ -77,7 +77,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 _isSignUp ? 'Create a new account' : 'Login to your account',
                 style: TextStyle(
                   fontSize: 16,
-                  color: Colors.white.withOpacity(0.8),
+                  color: Colors.white.withValues(alpha: 0.8),
                 ),
               ),
               const SizedBox(height: 40),
@@ -90,7 +90,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   borderRadius: BorderRadius.circular(24),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withOpacity(0.15),
+                      color: Colors.black.withValues(alpha: 0.15),
                       blurRadius: 20,
                       offset: const Offset(0, 10),
                     ),
@@ -239,7 +239,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   Text(
                     _isSignUp ? 'Already have an account? ' : "Don't have an account? ",
                     style: TextStyle(
-                      color: Colors.white.withOpacity(0.8),
+                      color: Colors.white.withValues(alpha: 0.8),
                       fontSize: 14,
                     ),
                   ),
@@ -267,7 +267,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 child: Text(
                   'Continue as Guest 👋',
                   style: TextStyle(
-                    color: Colors.white.withOpacity(0.7),
+                    color: Colors.white.withValues(alpha: 0.7),
                     fontSize: 14,
                   ),
                 ),
