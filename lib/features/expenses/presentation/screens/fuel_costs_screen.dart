@@ -70,7 +70,7 @@ class FuelCostsScreen extends StatelessWidget {
                         Container(
                           padding: const EdgeInsets.all(12),
                           decoration: BoxDecoration(
-                            color: AppColors.primaryLight.withOpacity(0.12),
+                            color: AppColors.primaryLight.withValues(alpha: 0.12),
                             borderRadius: BorderRadius.circular(14),
                           ),
                           child: const Icon(
@@ -163,7 +163,7 @@ class FuelCostsScreen extends StatelessWidget {
                         width: 42,
                         height: 42,
                         decoration: BoxDecoration(
-                          color: AppColors.primaryLight.withOpacity(0.12),
+                          color: AppColors.primaryLight.withValues(alpha: 0.12),
                           shape: BoxShape.circle,
                         ),
                         child: const Center(
