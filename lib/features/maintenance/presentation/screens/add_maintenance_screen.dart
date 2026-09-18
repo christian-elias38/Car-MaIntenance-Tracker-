@@ -23,12 +23,36 @@ class _AddMaintenanceScreenState extends State<AddMaintenanceScreen> {
   String _selectedCategory = 'Oil Change';
 
   final List<Map<String, dynamic>> _serviceCategories = [
-    {'name': 'Oil Change', 'icon': Icons.water_drop_rounded, 'color': const Color(0xFF0EA5E9)},
-    {'name': 'Tire Rotation', 'icon': Icons.adjust_rounded, 'color': const Color(0xFF8B5CF6)},
-    {'name': 'Brake Service', 'icon': Icons.disc_full_rounded, 'color': const Color(0xFFF59E0B)},
-    {'name': 'Engine Check', 'icon': Icons.minor_crash_rounded, 'color': const Color(0xFFEF4444)},
-    {'name': 'Battery', 'icon': Icons.battery_charging_full_rounded, 'color': const Color(0xFF10B981)},
-    {'name': 'Other', 'icon': Icons.more_horiz_rounded, 'color': const Color(0xFF64748B)},
+    {
+      'name': 'Oil Change',
+      'icon': Icons.water_drop_rounded,
+      'color': const Color(0xFF0EA5E9)
+    },
+    {
+      'name': 'Tire Rotation',
+      'icon': Icons.adjust_rounded,
+      'color': const Color(0xFF8B5CF6)
+    },
+    {
+      'name': 'Brake Service',
+      'icon': Icons.disc_full_rounded,
+      'color': const Color(0xFFF59E0B)
+    },
+    {
+      'name': 'Engine Check',
+      'icon': Icons.minor_crash_rounded,
+      'color': const Color(0xFFEF4444)
+    },
+    {
+      'name': 'Battery',
+      'icon': Icons.battery_charging_full_rounded,
+      'color': const Color(0xFF10B981)
+    },
+    {
+      'name': 'Other',
+      'icon': Icons.more_horiz_rounded,
+      'color': const Color(0xFF64748B)
+    },
   ];
 
   @override
@@ -40,7 +64,8 @@ class _AddMaintenanceScreenState extends State<AddMaintenanceScreen> {
 
     final activeCar = context.read<VehicleProvider>().activeVehicle;
     if (activeCar != null) {
-      _mileageController.text = activeCar.mileage.replaceAll(RegExp(r'[^0-9]'), '');
+      _mileageController.text =
+          activeCar.mileage.replaceAll(RegExp(r'[^0-9]'), '');
     } else {
       _mileageController.text = '45230';
     }
@@ -119,7 +144,9 @@ class _AddMaintenanceScreenState extends State<AddMaintenanceScreen> {
     if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(success ? 'Service record saved successfully!' : 'Failed to save record.'),
+          content: Text(success
+              ? 'Service record saved successfully!'
+              : 'Failed to save record.'),
           backgroundColor: success ? AppColors.primaryLight : AppColors.danger,
         ),
       );
@@ -155,17 +182,22 @@ class _AddMaintenanceScreenState extends State<AddMaintenanceScreen> {
                     style: TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.w600,
-                      color: isDark ? AppColors.darkTextSecondary : AppColors.lightTextSecondary,
+                      color: isDark
+                          ? AppColors.darkTextSecondary
+                          : AppColors.lightTextSecondary,
                     ),
                   ),
                   const SizedBox(height: 8),
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
                     decoration: BoxDecoration(
                       color: isDark ? AppColors.darkCard : Colors.white,
                       borderRadius: BorderRadius.circular(16),
                       border: Border.all(
-                        color: isDark ? AppColors.darkBorder : AppColors.lightBorder,
+                        color: isDark
+                            ? AppColors.darkBorder
+                            : AppColors.lightBorder,
                       ),
                     ),
                     child: DropdownButtonHideUnderline(
@@ -173,20 +205,24 @@ class _AddMaintenanceScreenState extends State<AddMaintenanceScreen> {
                         value: activeVehicle?.id,
                         isExpanded: true,
                         icon: const Icon(Icons.keyboard_arrow_down_rounded),
-                        dropdownColor: isDark ? AppColors.darkCard : Colors.white,
+                        dropdownColor:
+                            isDark ? AppColors.darkCard : Colors.white,
                         items: vehicles.map((v) {
                           return DropdownMenuItem<String>(
                             value: v.id,
                             child: Row(
                               children: [
-                                const Icon(Icons.directions_car_rounded, color: AppColors.primaryLight),
+                                const Icon(Icons.directions_car_rounded,
+                                    color: AppColors.primaryLight),
                                 const SizedBox(width: 10),
                                 Text(
                                   v.titleWithYear,
                                   style: TextStyle(
                                     fontSize: 15,
                                     fontWeight: FontWeight.w600,
-                                    color: isDark ? AppColors.darkTextPrimary : AppColors.lightTextPrimary,
+                                    color: isDark
+                                        ? AppColors.darkTextPrimary
+                                        : AppColors.lightTextPrimary,
                                   ),
                                 ),
                               ],
@@ -209,14 +245,17 @@ class _AddMaintenanceScreenState extends State<AddMaintenanceScreen> {
                     style: TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.w600,
-                      color: isDark ? AppColors.darkTextSecondary : AppColors.lightTextSecondary,
+                      color: isDark
+                          ? AppColors.darkTextSecondary
+                          : AppColors.lightTextSecondary,
                     ),
                   ),
                   const SizedBox(height: 12),
                   GridView.builder(
                     shrinkWrap: true,
                     physics: const NeverScrollableScrollPhysics(),
-                    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                    gridDelegate:
+                        const SliverGridDelegateWithFixedCrossAxisCount(
                       crossAxisCount: 2,
                       crossAxisSpacing: 12,
                       mainAxisSpacing: 12,
@@ -238,13 +277,17 @@ class _AddMaintenanceScreenState extends State<AddMaintenanceScreen> {
                           padding: const EdgeInsets.all(12),
                           decoration: BoxDecoration(
                             color: isSelected
-                                ? (isDark ? AppColors.darkSurface : AppColors.mintBackground)
+                                ? (isDark
+                                    ? AppColors.darkSurface
+                                    : AppColors.mintBackground)
                                 : (isDark ? AppColors.darkCard : Colors.white),
                             borderRadius: BorderRadius.circular(16),
                             border: Border.all(
                               color: isSelected
                                   ? AppColors.primaryLight
-                                  : (isDark ? AppColors.darkBorder : AppColors.lightBorder),
+                                  : (isDark
+                                      ? AppColors.darkBorder
+                                      : AppColors.lightBorder),
                               width: isSelected ? 2 : 1,
                             ),
                           ),
@@ -255,13 +298,18 @@ class _AddMaintenanceScreenState extends State<AddMaintenanceScreen> {
                                 height: 38,
                                 decoration: BoxDecoration(
                                   color: isSelected
-                                      ? AppColors.primaryLight.withValues(alpha: 0.2)
-                                      : (isDark ? AppColors.darkBackground : AppColors.lightBackground),
+                                      ? AppColors.primaryLight
+                                          .withValues(alpha: 0.2)
+                                      : (isDark
+                                          ? AppColors.darkBackground
+                                          : AppColors.lightBackground),
                                   shape: BoxShape.circle,
                                 ),
                                 child: Icon(
                                   icon,
-                                  color: isSelected ? AppColors.primaryLight : (item['color'] as Color),
+                                  color: isSelected
+                                      ? AppColors.primaryLight
+                                      : (item['color'] as Color),
                                   size: 20,
                                 ),
                               ),
@@ -271,8 +319,12 @@ class _AddMaintenanceScreenState extends State<AddMaintenanceScreen> {
                                   name,
                                   style: TextStyle(
                                     fontSize: 13,
-                                    fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
-                                    color: isDark ? AppColors.darkTextPrimary : AppColors.lightTextPrimary,
+                                    fontWeight: isSelected
+                                        ? FontWeight.bold
+                                        : FontWeight.w500,
+                                    color: isDark
+                                        ? AppColors.darkTextPrimary
+                                        : AppColors.lightTextPrimary,
                                   ),
                                 ),
                               ),
@@ -296,7 +348,9 @@ class _AddMaintenanceScreenState extends State<AddMaintenanceScreen> {
                               style: TextStyle(
                                 fontSize: 14,
                                 fontWeight: FontWeight.w600,
-                                color: isDark ? AppColors.darkTextSecondary : AppColors.lightTextSecondary,
+                                color: isDark
+                                    ? AppColors.darkTextSecondary
+                                    : AppColors.lightTextSecondary,
                               ),
                             ),
                             const SizedBox(height: 8),
@@ -308,7 +362,8 @@ class _AddMaintenanceScreenState extends State<AddMaintenanceScreen> {
                                 hintText: 'Select date',
                                 prefixIcon: Icon(Icons.calendar_today_outlined),
                               ),
-                              validator: (v) => v == null || v.isEmpty ? 'Required' : null,
+                              validator: (v) =>
+                                  v == null || v.isEmpty ? 'Required' : null,
                             ),
                           ],
                         ),
@@ -323,7 +378,9 @@ class _AddMaintenanceScreenState extends State<AddMaintenanceScreen> {
                               style: TextStyle(
                                 fontSize: 14,
                                 fontWeight: FontWeight.w600,
-                                color: isDark ? AppColors.darkTextSecondary : AppColors.lightTextSecondary,
+                                color: isDark
+                                    ? AppColors.darkTextSecondary
+                                    : AppColors.lightTextSecondary,
                               ),
                             ),
                             const SizedBox(height: 8),
@@ -334,7 +391,8 @@ class _AddMaintenanceScreenState extends State<AddMaintenanceScreen> {
                                 hintText: '45230',
                                 prefixIcon: Icon(Icons.speed_outlined),
                               ),
-                              validator: (v) => v == null || v.isEmpty ? 'Required' : null,
+                              validator: (v) =>
+                                  v == null || v.isEmpty ? 'Required' : null,
                             ),
                           ],
                         ),
@@ -349,7 +407,9 @@ class _AddMaintenanceScreenState extends State<AddMaintenanceScreen> {
                     style: TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.w600,
-                      color: isDark ? AppColors.darkTextSecondary : AppColors.lightTextSecondary,
+                      color: isDark
+                          ? AppColors.darkTextSecondary
+                          : AppColors.lightTextSecondary,
                     ),
                   ),
                   const SizedBox(height: 8),
@@ -361,7 +421,8 @@ class _AddMaintenanceScreenState extends State<AddMaintenanceScreen> {
                       prefixIcon: const Icon(Icons.attach_money),
                       suffixText: userProvider.currency,
                     ),
-                    validator: (v) => v == null || v.isEmpty ? 'Please enter cost' : null,
+                    validator: (v) =>
+                        v == null || v.isEmpty ? 'Please enter cost' : null,
                   ),
                   const SizedBox(height: 20),
 
@@ -371,7 +432,9 @@ class _AddMaintenanceScreenState extends State<AddMaintenanceScreen> {
                     style: TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.w600,
-                      color: isDark ? AppColors.darkTextSecondary : AppColors.lightTextSecondary,
+                      color: isDark
+                          ? AppColors.darkTextSecondary
+                          : AppColors.lightTextSecondary,
                     ),
                   ),
                   const SizedBox(height: 8),
@@ -379,7 +442,8 @@ class _AddMaintenanceScreenState extends State<AddMaintenanceScreen> {
                     controller: _notesController,
                     maxLines: 3,
                     decoration: const InputDecoration(
-                      hintText: 'e.g. Used synthetic oil, checked fluid levels...',
+                      hintText:
+                          'e.g. Used synthetic oil, checked fluid levels...',
                       prefixIcon: Icon(Icons.notes_outlined),
                     ),
                   ),
@@ -387,7 +451,9 @@ class _AddMaintenanceScreenState extends State<AddMaintenanceScreen> {
 
                   // Save Service Button
                   if (provider.isLoading)
-                    const Center(child: CircularProgressIndicator(color: AppColors.primaryLight))
+                    const Center(
+                        child: CircularProgressIndicator(
+                            color: AppColors.primaryLight))
                   else
                     SizedBox(
                       width: double.infinity,
@@ -395,7 +461,9 @@ class _AddMaintenanceScreenState extends State<AddMaintenanceScreen> {
                       child: ElevatedButton(
                         onPressed: _submit,
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: isDark ? AppColors.primaryLight : AppColors.primary,
+                          backgroundColor: isDark
+                              ? AppColors.primaryLight
+                              : AppColors.primary,
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(28),
                           ),
