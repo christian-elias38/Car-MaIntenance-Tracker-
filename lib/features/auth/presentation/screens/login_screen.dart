@@ -55,10 +55,12 @@ class _LoginScreenState extends State<LoginScreen> {
                   decoration: BoxDecoration(
                     color: Colors.white.withValues(alpha: 0.12),
                     shape: BoxShape.circle,
-                    border: Border.all(color: Colors.white.withValues(alpha: 0.2), width: 2),
+                    border: Border.all(
+                        color: Colors.white.withValues(alpha: 0.2), width: 2),
                   ),
                   child: const Center(
-                    child: Icon(Icons.directions_car_rounded, size: 50, color: Colors.white),
+                    child: Icon(Icons.directions_car_rounded,
+                        size: 50, color: Colors.white),
                   ),
                 ),
               ),
@@ -105,7 +107,9 @@ class _LoginScreenState extends State<LoginScreen> {
                       style: TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.w600,
-                        color: isDark ? AppColors.darkTextPrimary : AppColors.lightTextPrimary,
+                        color: isDark
+                            ? AppColors.darkTextPrimary
+                            : AppColors.lightTextPrimary,
                       ),
                     ),
                     const SizedBox(height: 8),
@@ -113,7 +117,9 @@ class _LoginScreenState extends State<LoginScreen> {
                       controller: _emailController,
                       keyboardType: TextInputType.emailAddress,
                       style: TextStyle(
-                        color: isDark ? AppColors.darkTextPrimary : AppColors.lightTextPrimary,
+                        color: isDark
+                            ? AppColors.darkTextPrimary
+                            : AppColors.lightTextPrimary,
                       ),
                       decoration: const InputDecoration(
                         hintText: 'Enter your email',
@@ -128,7 +134,9 @@ class _LoginScreenState extends State<LoginScreen> {
                       style: TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.w600,
-                        color: isDark ? AppColors.darkTextPrimary : AppColors.lightTextPrimary,
+                        color: isDark
+                            ? AppColors.darkTextPrimary
+                            : AppColors.lightTextPrimary,
                       ),
                     ),
                     const SizedBox(height: 8),
@@ -136,17 +144,22 @@ class _LoginScreenState extends State<LoginScreen> {
                       controller: _passwordController,
                       obscureText: _obscurePassword,
                       style: TextStyle(
-                        color: isDark ? AppColors.darkTextPrimary : AppColors.lightTextPrimary,
+                        color: isDark
+                            ? AppColors.darkTextPrimary
+                            : AppColors.lightTextPrimary,
                       ),
                       decoration: InputDecoration(
                         hintText: 'Enter your password',
                         prefixIcon: const Icon(Icons.lock_outline),
                         suffixIcon: IconButton(
                           icon: Icon(
-                            _obscurePassword ? Icons.visibility_outlined : Icons.visibility_off_outlined,
+                            _obscurePassword
+                                ? Icons.visibility_outlined
+                                : Icons.visibility_off_outlined,
                           ),
                           onPressed: () {
-                            setState(() => _obscurePassword = !_obscurePassword);
+                            setState(
+                                () => _obscurePassword = !_obscurePassword);
                           },
                         ),
                       ),
@@ -178,7 +191,9 @@ class _LoginScreenState extends State<LoginScreen> {
                               'Remember me',
                               style: TextStyle(
                                 fontSize: 13,
-                                color: isDark ? AppColors.darkTextSecondary : AppColors.lightTextSecondary,
+                                color: isDark
+                                    ? AppColors.darkTextSecondary
+                                    : AppColors.lightTextSecondary,
                               ),
                             ),
                           ],
@@ -186,7 +201,9 @@ class _LoginScreenState extends State<LoginScreen> {
                         TextButton(
                           onPressed: () {
                             ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(content: Text('Password reset link sent to your email.')),
+                              const SnackBar(
+                                  content: Text(
+                                      'Password reset link sent to your email.')),
                             );
                           },
                           style: TextButton.styleFrom(padding: EdgeInsets.zero),
@@ -210,7 +227,9 @@ class _LoginScreenState extends State<LoginScreen> {
                       child: ElevatedButton(
                         onPressed: _submit,
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: isDark ? AppColors.primaryLight : AppColors.primary,
+                          backgroundColor: isDark
+                              ? AppColors.primaryLight
+                              : AppColors.primary,
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(26),
                           ),
@@ -237,7 +256,9 @@ class _LoginScreenState extends State<LoginScreen> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Text(
-                    _isSignUp ? 'Already have an account? ' : "Don't have an account? ",
+                    _isSignUp
+                        ? 'Already have an account? '
+                        : "Don't have an account? ",
                     style: TextStyle(
                       color: Colors.white.withValues(alpha: 0.8),
                       fontSize: 14,
