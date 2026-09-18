@@ -23,9 +23,9 @@ class EndCoverScreen extends StatelessWidget {
                   begin: Alignment.topCenter,
                   end: Alignment.bottomCenter,
                   colors: [
-                    Colors.black.withOpacity(0.3),
-                    Colors.black.withOpacity(0.6),
-                    Colors.black.withOpacity(0.9),
+                    Colors.black.withValues(alpha: 0.3),
+                    Colors.black.withValues(alpha: 0.6),
+                    Colors.black.withValues(alpha: 0.9),
                   ],
                 ),
               ),
@@ -46,7 +46,7 @@ class EndCoverScreen extends StatelessWidget {
                         width: 70,
                         height: 70,
                         decoration: BoxDecoration(
-                          color: AppColors.primaryLight.withOpacity(0.2),
+                          color: AppColors.primaryLight.withValues(alpha: 0.2),
                           shape: BoxShape.circle,
                           border: Border.all(color: AppColors.primaryLight, width: 2),
                         ),
@@ -75,7 +75,7 @@ class EndCoverScreen extends StatelessWidget {
                         textAlign: TextAlign.center,
                         style: TextStyle(
                           fontSize: 16,
-                          color: Colors.white.withOpacity(0.8),
+                          color: Colors.white.withValues(alpha: 0.8),
                         ),
                       ),
                     ],
