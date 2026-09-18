@@ -21,7 +21,14 @@ class _RemindersScreenState extends State<RemindersScreen> {
     final mileageController = TextEditingController(text: '50,000 km');
     String selectedCategory = 'Oil Change';
 
-    final categories = ['Oil Change', 'Tire Rotation', 'Brake Service', 'Engine Check', 'Battery', 'General Inspection'];
+    final categories = [
+      'Oil Change',
+      'Tire Rotation',
+      'Brake Service',
+      'Engine Check',
+      'Battery',
+      'General Inspection'
+    ];
 
     showDialog(
       context: context,
@@ -29,7 +36,8 @@ class _RemindersScreenState extends State<RemindersScreen> {
         builder: (context, setDialogState) {
           return AlertDialog(
             title: const Text('Add Maintenance Reminder'),
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
             content: SingleChildScrollView(
               child: Column(
                 mainAxisSize: MainAxisSize.min,
@@ -46,9 +54,13 @@ class _RemindersScreenState extends State<RemindersScreen> {
                   DropdownButtonFormField<String>(
                     initialValue: selectedCategory,
                     decoration: const InputDecoration(labelText: 'Category'),
-                    items: categories.map((c) => DropdownMenuItem(value: c, child: Text(c))).toList(),
+                    items: categories
+                        .map((c) => DropdownMenuItem(value: c, child: Text(c)))
+                        .toList(),
                     onChanged: (val) {
-                      if (val != null) setDialogState(() => selectedCategory = val);
+                      if (val != null) {
+                        setDialogState(() => selectedCategory = val);
+                      }
                     },
                   ),
                   const SizedBox(height: 12),
@@ -79,7 +91,8 @@ class _RemindersScreenState extends State<RemindersScreen> {
                 onPressed: () {
                   if (titleController.text.trim().isEmpty) return;
 
-                  final activeCar = context.read<VehicleProvider>().activeVehicle;
+                  final activeCar =
+                      context.read<VehicleProvider>().activeVehicle;
                   final reminder = ReminderModel(
                     id: '',
                     vehicleId: activeCar?.id ?? 'v1',
@@ -106,7 +119,9 @@ class _RemindersScreenState extends State<RemindersScreen> {
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final reminderProvider = context.watch<ReminderProvider>();
-    final list = _showUpcoming ? reminderProvider.upcomingReminders : reminderProvider.completedReminders;
+    final list = _showUpcoming
+        ? reminderProvider.upcomingReminders
+        : reminderProvider.completedReminders;
 
     return Scaffold(
       appBar: AppBar(
@@ -147,7 +162,9 @@ class _RemindersScreenState extends State<RemindersScreen> {
                                 fontWeight: FontWeight.bold,
                                 color: _showUpcoming
                                     ? Colors.white
-                                    : (isDark ? AppColors.darkTextSecondary : AppColors.lightTextSecondary),
+                                    : (isDark
+                                        ? AppColors.darkTextSecondary
+                                        : AppColors.lightTextSecondary),
                               ),
                             ),
                           ),
@@ -173,7 +190,9 @@ class _RemindersScreenState extends State<RemindersScreen> {
                                 fontWeight: FontWeight.bold,
                                 color: !_showUpcoming
                                     ? Colors.white
-                                    : (isDark ? AppColors.darkTextSecondary : AppColors.lightTextSecondary),
+                                    : (isDark
+                                        ? AppColors.darkTextSecondary
+                                        : AppColors.lightTextSecondary),
                               ),
                             ),
                           ),
@@ -190,9 +209,13 @@ class _RemindersScreenState extends State<RemindersScreen> {
                 Padding(
                   padding: const EdgeInsets.all(40),
                   child: Text(
-                    _showUpcoming ? 'No upcoming reminders' : 'No past reminders',
+                    _showUpcoming
+                        ? 'No upcoming reminders'
+                        : 'No past reminders',
                     style: TextStyle(
-                      color: isDark ? AppColors.darkTextSecondary : AppColors.lightTextSecondary,
+                      color: isDark
+                          ? AppColors.darkTextSecondary
+                          : AppColors.lightTextSecondary,
                     ),
                   ),
                 )
@@ -204,11 +227,14 @@ class _RemindersScreenState extends State<RemindersScreen> {
                       color: isDark ? AppColors.darkCard : Colors.white,
                       borderRadius: BorderRadius.circular(16),
                       border: Border.all(
-                        color: isDark ? AppColors.darkBorder : AppColors.lightBorder,
+                        color: isDark
+                            ? AppColors.darkBorder
+                            : AppColors.lightBorder,
                       ),
                     ),
                     child: ListTile(
-                      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                      contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 16, vertical: 8),
                       leading: Container(
                         width: 44,
                         height: 44,
@@ -229,7 +255,9 @@ class _RemindersScreenState extends State<RemindersScreen> {
                         style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.bold,
-                          color: isDark ? AppColors.darkTextPrimary : AppColors.lightTextPrimary,
+                          color: isDark
+                              ? AppColors.darkTextPrimary
+                              : AppColors.lightTextPrimary,
                         ),
                       ),
                       subtitle: Padding(
@@ -238,13 +266,17 @@ class _RemindersScreenState extends State<RemindersScreen> {
                           'Due in ${item.dueDate}  •  ${item.dueMileage}',
                           style: TextStyle(
                             fontSize: 13,
-                            color: isDark ? AppColors.darkTextSecondary : AppColors.lightTextSecondary,
+                            color: isDark
+                                ? AppColors.darkTextSecondary
+                                : AppColors.lightTextSecondary,
                           ),
                         ),
                       ),
                       trailing: Icon(
                         Icons.chevron_right_rounded,
-                        color: isDark ? AppColors.darkTextSecondary : AppColors.lightTextSecondary,
+                        color: isDark
+                            ? AppColors.darkTextSecondary
+                            : AppColors.lightTextSecondary,
                       ),
                     ),
                   );
@@ -256,7 +288,8 @@ class _RemindersScreenState extends State<RemindersScreen> {
               Container(
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
-                  color: isDark ? AppColors.darkSurface : AppColors.mintBackground,
+                  color:
+                      isDark ? AppColors.darkSurface : AppColors.mintBackground,
                   borderRadius: BorderRadius.circular(16),
                   border: Border.all(
                     color: AppColors.primaryLight.withValues(alpha: 0.3),
@@ -287,7 +320,9 @@ class _RemindersScreenState extends State<RemindersScreen> {
                             'Regular maintenance extends your vehicle\'s life and saves you money!',
                             style: TextStyle(
                               fontSize: 13,
-                              color: isDark ? AppColors.darkTextPrimary : AppColors.lightTextPrimary,
+                              color: isDark
+                                  ? AppColors.darkTextPrimary
+                                  : AppColors.lightTextPrimary,
                             ),
                           ),
                         ],
@@ -304,7 +339,8 @@ class _RemindersScreenState extends State<RemindersScreen> {
         onPressed: () => _showAddReminderDialog(context),
         backgroundColor: AppColors.primaryLight,
         icon: const Icon(Icons.alarm_add, color: Colors.white),
-        label: const Text('Add Reminder', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+        label: const Text('Add Reminder',
+            style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
       ),
     );
   }
