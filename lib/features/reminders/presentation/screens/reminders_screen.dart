@@ -213,7 +213,7 @@ class _RemindersScreenState extends State<RemindersScreen> {
                         width: 44,
                         height: 44,
                         decoration: BoxDecoration(
-                          color: AppColors.primaryLight.withOpacity(0.12),
+                          color: AppColors.primaryLight.withValues(alpha: 0.12),
                           shape: BoxShape.circle,
                         ),
                         child: const Center(
@@ -259,7 +259,7 @@ class _RemindersScreenState extends State<RemindersScreen> {
                   color: isDark ? AppColors.darkSurface : AppColors.mintBackground,
                   borderRadius: BorderRadius.circular(16),
                   border: Border.all(
-                    color: AppColors.primaryLight.withOpacity(0.3),
+                    color: AppColors.primaryLight.withValues(alpha: 0.3),
                   ),
                 ),
                 child: Row(
