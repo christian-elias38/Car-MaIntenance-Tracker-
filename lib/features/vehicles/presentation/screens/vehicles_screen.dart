@@ -17,31 +17,6 @@ class VehiclesScreen extends StatelessWidget {
     );
   }
 
-  void _confirmDelete(BuildContext context, String id, String carName) {
-    showDialog(
-      context: context,
-      builder: (_) => AlertDialog(
-        title: const Text('Delete Vehicle'),
-        content: Text('Are you sure you want to remove $carName from your garage?'),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
-          ),
-          ElevatedButton(
-            onPressed: () {
-              Navigator.pop(context);
-              context.read<VehicleProvider>().deleteVehicle(id);
-            },
-            style: ElevatedButton.styleFrom(backgroundColor: AppColors.danger),
-            child: const Text('Delete'),
-          ),
-        ],
-      ),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
@@ -51,19 +26,20 @@ class VehiclesScreen extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('My Garage & Vehicles'),
+        title: const Text('My Vehicles'),
         elevation: 0,
         actions: [
           Padding(
             padding: const EdgeInsets.only(right: 16),
             child: Container(
-              width: 40,
-              height: 40,
+              width: 38,
+              height: 38,
               decoration: const BoxDecoration(
                 color: AppColors.primaryLight,
                 shape: BoxShape.circle,
               ),
               child: IconButton(
+                padding: EdgeInsets.zero,
                 icon: const Icon(Icons.add, color: Colors.white, size: 22),
                 onPressed: () => _showAddDialog(context),
               ),
@@ -73,28 +49,26 @@ class VehiclesScreen extends StatelessWidget {
       ),
       body: SafeArea(
         child: ListView.builder(
-          padding: const EdgeInsets.all(20),
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
           itemCount: vehicles.length,
           itemBuilder: (context, index) {
             final vehicle = vehicles[index];
-            final isActive = activeVehicle?.id == vehicle.id;
+            final isActive = activeVehicle?.id == vehicle.id || vehicle.isDefault;
 
             return Container(
-              margin: const EdgeInsets.only(bottom: 16),
+              margin: const EdgeInsets.only(bottom: 14),
               decoration: BoxDecoration(
                 color: isDark ? AppColors.darkCard : Colors.white,
-                borderRadius: BorderRadius.circular(22),
+                borderRadius: BorderRadius.circular(18),
                 border: Border.all(
-                  color: isActive
-                      ? AppColors.primaryLight
-                      : (isDark ? AppColors.darkBorder : AppColors.lightBorder),
-                  width: isActive ? 2 : 1,
+                  color: isDark ? AppColors.darkBorder : Colors.black.withValues(alpha: 0.05),
+                  width: 1,
                 ),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.04),
-                    blurRadius: 10,
-                    offset: const Offset(0, 4),
+                    color: Colors.black.withValues(alpha: 0.03),
+                    blurRadius: 8,
+                    offset: const Offset(0, 3),
                   ),
                 ],
               ),
@@ -108,141 +82,69 @@ class VehiclesScreen extends StatelessWidget {
                     ),
                   );
                 },
-                borderRadius: BorderRadius.circular(22),
+                borderRadius: BorderRadius.circular(18),
                 child: Padding(
-                  padding: const EdgeInsets.all(16),
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
                   child: Row(
                     children: [
                       // Car Thumbnail Photo
                       AppVehicleImage(
                         imagePath: vehicle.imagePath,
-                        width: 84,
-                        height: 64,
-                        borderRadius: BorderRadius.circular(16),
+                        width: 76,
+                        height: 54,
+                        borderRadius: BorderRadius.circular(12),
                       ),
-                      const SizedBox(width: 16),
+                      const SizedBox(width: 14),
 
                       // Details
                       Expanded(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Row(
-                              children: [
-                                Expanded(
-                                  child: Text(
-                                    vehicle.displayName,
-                                    maxLines: 1,
-                                    overflow: TextOverflow.ellipsis,
-                                    style: TextStyle(
-                                      fontSize: 17,
-                                      fontWeight: FontWeight.bold,
-                                      color: isDark ? AppColors.darkTextPrimary : AppColors.lightTextPrimary,
-                                    ),
-                                  ),
-                                ),
-                                if (isActive) ...[
-                                  const SizedBox(width: 6),
-                                  Container(
-                                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                                    decoration: BoxDecoration(
-                                      color: AppColors.primaryLight.withValues(alpha: 0.15),
-                                      borderRadius: BorderRadius.circular(6),
-                                    ),
-                                    child: const Text(
-                                      'Active',
-                                      style: TextStyle(
-                                        fontSize: 11,
-                                        fontWeight: FontWeight.bold,
-                                        color: AppColors.primaryLight,
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ],
+                            Text(
+                              vehicle.displayName,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                                color: isDark ? AppColors.darkTextPrimary : AppColors.lightTextPrimary,
+                              ),
                             ),
                             const SizedBox(height: 4),
                             Text(
-                              '${vehicle.year} • ${vehicle.mileage} • ${vehicle.bodyType}',
+                              '${vehicle.year}  •  ${vehicle.mileage}',
                               style: TextStyle(
                                 fontSize: 13,
                                 color: isDark ? AppColors.darkTextSecondary : AppColors.lightTextSecondary,
                               ),
                             ),
-                            const SizedBox(height: 6),
-                            Row(
-                              children: [
-                                _buildMiniBadge(vehicle.horsepower, AppColors.primaryLight),
-                                const SizedBox(width: 6),
-                                _buildMiniBadge(vehicle.drivetrain, AppColors.info),
-                                const SizedBox(width: 6),
-                                _buildMiniBadge(vehicle.fuelType, AppColors.warning),
-                              ],
-                            ),
+                            if (isActive) ...[
+                              const SizedBox(height: 6),
+                              Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                                decoration: BoxDecoration(
+                                  color: AppColors.primaryLight.withValues(alpha: 0.15),
+                                  borderRadius: BorderRadius.circular(6),
+                                ),
+                                child: const Text(
+                                  'Default',
+                                  style: TextStyle(
+                                    fontSize: 10,
+                                    fontWeight: FontWeight.bold,
+                                    color: AppColors.primaryLight,
+                                  ),
+                                ),
+                              ),
+                            ],
                           ],
                         ),
                       ),
 
-                      // Popup Action Menu
-                      PopupMenuButton<String>(
-                        icon: Icon(
-                          Icons.more_vert_rounded,
-                          color: isDark ? AppColors.darkTextSecondary : AppColors.lightTextSecondary,
-                        ),
-                        onSelected: (value) {
-                          if (value == 'select') {
-                            vehicleProvider.selectVehicle(vehicle.id);
-                          } else if (value == 'default') {
-                            vehicleProvider.setDefaultVehicle(vehicle.id);
-                          } else if (value == 'edit') {
-                            _showAddDialog(context, vehicle);
-                          } else if (value == 'delete') {
-                            _confirmDelete(context, vehicle.id, vehicle.displayName);
-                          }
-                        },
-                        itemBuilder: (context) => [
-                          const PopupMenuItem(
-                            value: 'select',
-                            child: Row(
-                              children: [
-                                Icon(Icons.check_circle_outline, size: 18),
-                                SizedBox(width: 8),
-                                Text('Select Active'),
-                              ],
-                            ),
-                          ),
-                          const PopupMenuItem(
-                            value: 'default',
-                            child: Row(
-                              children: [
-                                Icon(Icons.star_outline, size: 18),
-                                SizedBox(width: 8),
-                                Text('Set as Default'),
-                              ],
-                            ),
-                          ),
-                          const PopupMenuItem(
-                            value: 'edit',
-                            child: Row(
-                              children: [
-                                Icon(Icons.edit_outlined, size: 18),
-                                SizedBox(width: 8),
-                                Text('Edit All Specific Details'),
-                              ],
-                            ),
-                          ),
-                          if (vehicles.length > 1)
-                            const PopupMenuItem(
-                              value: 'delete',
-                              child: Row(
-                                children: [
-                                  Icon(Icons.delete_outline, color: AppColors.danger, size: 18),
-                                  SizedBox(width: 8),
-                                  Text('Delete Vehicle', style: TextStyle(color: AppColors.danger)),
-                                ],
-                              ),
-                            ),
-                        ],
+                      Icon(
+                        Icons.chevron_right_rounded,
+                        color: isDark ? AppColors.darkTextSecondary : AppColors.lightTextSecondary,
+                        size: 24,
                       ),
                     ],
                   ),
@@ -250,30 +152,6 @@ class VehiclesScreen extends StatelessWidget {
               ),
             );
           },
-        ),
-      ),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: () => _showAddDialog(context),
-        backgroundColor: AppColors.primaryLight,
-        icon: const Icon(Icons.add, color: Colors.white),
-        label: const Text('Add Vehicle', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
-      ),
-    );
-  }
-
-  Widget _buildMiniBadge(String label, Color color) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-      decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.12),
-        borderRadius: BorderRadius.circular(4),
-      ),
-      child: Text(
-        label,
-        style: TextStyle(
-          fontSize: 10,
-          fontWeight: FontWeight.bold,
-          color: color,
         ),
       ),
     );
