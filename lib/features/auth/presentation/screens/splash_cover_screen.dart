@@ -50,25 +50,24 @@ class SplashCoverScreen extends StatelessWidget {
                   // Center Logo & Title
                   Column(
                     children: [
-                      // CarTrack Gear Logo Icon
-                      Container(
-                        width: 80,
-                        height: 80,
-                        decoration: BoxDecoration(
-                          color: AppColors.primaryLight.withValues(alpha: 0.2),
-                          shape: BoxShape.circle,
-                          border: Border.all(
-                              color: AppColors.primaryLight, width: 2),
-                        ),
-                        child: const Center(
-                          child: Icon(
+                      // CarTrack Gear + Car Logo Stack Icon
+                      Stack(
+                        alignment: Alignment.center,
+                        children: [
+                          Icon(
+                            Icons.settings_suggest_rounded,
+                            size: 90,
+                            color: AppColors.primaryLight.withValues(alpha: 0.95),
+                          ),
+                          const Icon(
                             Icons.directions_car_filled_rounded,
-                            size: 46,
+                            size: 44,
                             color: Colors.white,
                           ),
-                        ),
+                        ],
                       ),
                       const SizedBox(height: 16),
+
                       const Text(
                         'CarTrack',
                         style: TextStyle(
