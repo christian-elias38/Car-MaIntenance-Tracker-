@@ -4,12 +4,16 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/theme_provider.dart';
 import '../../../profile/presentation/providers/user_provider.dart';
 import '../../../vehicles/presentation/providers/vehicle_provider.dart';
+import '../../../vehicles/presentation/widgets/app_vehicle_image.dart';
 import '../../../reminders/presentation/providers/reminder_provider.dart';
 import '../providers/maintenance_provider.dart';
 import '../widgets/maintenance_card.dart';
+import '../widgets/stat_card_widget.dart';
+import '../widgets/maintenance_tip_card.dart';
 import 'edit_maintenance_screen.dart';
 import 'service_history_screen.dart';
 import '../../../vehicles/presentation/screens/vehicle_details_screen.dart';
+
 
 class HomeScreen extends StatefulWidget {
   final Function(int)? onNavigateTab;
@@ -222,7 +226,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                     const SizedBox(height: 20),
 
-                    // Active Vehicle Banner Card
+                    // Hero Active Vehicle Banner Card
                     GestureDetector(
                       onTap: () {
                         if (activeCar != null) {
@@ -238,55 +242,77 @@ class _HomeScreenState extends State<HomeScreen> {
                         padding: const EdgeInsets.all(16),
                         decoration: BoxDecoration(
                           color: isDark ? AppColors.darkCard : Colors.white,
-                          borderRadius: BorderRadius.circular(22),
+                          borderRadius: BorderRadius.circular(24),
                           border: Border.all(
-                            color: isDark ? AppColors.darkBorder : AppColors.lightBorder,
+                            color: isDark
+                                ? AppColors.darkBorder
+                                : AppColors.primary.withValues(alpha: 0.12),
+                            width: 1.2,
                           ),
                           boxShadow: [
                             BoxShadow(
-                              color: Colors.black.withValues(alpha: 0.04),
-                              blurRadius: 12,
-                              offset: const Offset(0, 4),
+                              color: isDark
+                                  ? Colors.black.withValues(alpha: 0.25)
+                                  : AppColors.primary.withValues(alpha: 0.08),
+                              blurRadius: 18,
+                              offset: const Offset(0, 6),
                             ),
                           ],
                         ),
                         child: Row(
                           children: [
                             // Vehicle Thumbnail Photo
-                            Container(
-                              width: 76,
-                              height: 58,
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(14),
-                              ),
-                              child: ClipRRect(
-                                borderRadius: BorderRadius.circular(14),
-                                child: Image.asset(
-                                  activeCar?.imagePath ?? 'assets/images/cool_car_landing.jpg',
-                                  fit: BoxFit.cover,
-                                ),
-                              ),
+                            AppVehicleImage(
+                              imagePath: activeCar?.imagePath ?? 'assets/images/cool_car_landing.jpg',
+                              width: 82,
+                              height: 64,
+                              borderRadius: BorderRadius.circular(16),
                             ),
                             const SizedBox(width: 14),
                             Expanded(
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Text(
-                                    activeCar?.titleWithYear ?? 'Phantom Aero GT (2024)',
-                                    style: TextStyle(
-                                      fontSize: 17,
-                                      fontWeight: FontWeight.bold,
-                                      color: isDark ? AppColors.darkTextPrimary : AppColors.lightTextPrimary,
-                                    ),
+                                  Row(
+                                    children: [
+                                      Expanded(
+                                        child: Text(
+                                          activeCar?.titleWithYear ?? 'Phantom Aero GT (2024)',
+                                          maxLines: 1,
+                                          overflow: TextOverflow.ellipsis,
+                                          style: TextStyle(
+                                            fontSize: 17,
+                                            fontWeight: FontWeight.bold,
+                                            color: isDark ? AppColors.darkTextPrimary : AppColors.lightTextPrimary,
+                                          ),
+                                        ),
+                                      ),
+                                      Container(
+                                        padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
+                                        decoration: BoxDecoration(
+                                          color: AppColors.primaryLight.withValues(alpha: 0.15),
+                                          borderRadius: BorderRadius.circular(6),
+                                        ),
+                                        child: const Text(
+                                          'Active',
+                                          style: TextStyle(
+                                            fontSize: 10,
+                                            fontWeight: FontWeight.bold,
+                                            color: AppColors.primaryLight,
+                                          ),
+                                        ),
+                                      ),
+                                    ],
                                   ),
-                                  const SizedBox(height: 4),
+                                  const SizedBox(height: 6),
                                   Row(
                                     children: [
                                       Container(
                                         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                                         decoration: BoxDecoration(
-                                          color: AppColors.primaryLight.withValues(alpha: 0.15),
+                                          color: isDark
+                                              ? AppColors.darkSurface
+                                              : AppColors.mintBackground,
                                           borderRadius: BorderRadius.circular(6),
                                         ),
                                         child: Text(
@@ -299,12 +325,16 @@ class _HomeScreenState extends State<HomeScreen> {
                                         ),
                                       ),
                                       const SizedBox(width: 8),
-                                      Text(
-                                        '${activeCar?.horsepower ?? '850 hp'} • ${activeCar?.drivetrain ?? 'AWD'}',
-                                        style: TextStyle(
-                                          fontSize: 12,
-                                          fontWeight: FontWeight.w500,
-                                          color: isDark ? AppColors.darkTextSecondary : AppColors.lightTextSecondary,
+                                      Expanded(
+                                        child: Text(
+                                          '${activeCar?.horsepower ?? '850 hp'} • ${activeCar?.drivetrain ?? 'AWD'}',
+                                          maxLines: 1,
+                                          overflow: TextOverflow.ellipsis,
+                                          style: TextStyle(
+                                            fontSize: 12,
+                                            fontWeight: FontWeight.w500,
+                                            color: isDark ? AppColors.darkTextSecondary : AppColors.lightTextSecondary,
+                                          ),
                                         ),
                                       ),
                                     ],
@@ -312,6 +342,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                 ],
                               ),
                             ),
+                            const SizedBox(width: 6),
                             Icon(
                               Icons.chevron_right_rounded,
                               color: isDark ? AppColors.darkTextSecondary : AppColors.lightTextSecondary,
@@ -323,46 +354,74 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                     const SizedBox(height: 20),
 
-                    // 4 Stat Overview Grid
+                    // 4 Stat Overview Grid with Visual Sparklines & Badges
                     GridView.count(
                       crossAxisCount: 2,
                       shrinkWrap: true,
                       physics: const NeverScrollableScrollPhysics(),
                       crossAxisSpacing: 14,
                       mainAxisSpacing: 14,
-                      childAspectRatio: 1.55,
+                      childAspectRatio: 1.35,
                       children: [
-                        _buildStatCard(
-                          context,
-                          icon: Icons.calendar_today_rounded,
+                        StatCardWidget(
+                          icon: Icons.notifications_active_rounded,
                           label: 'Upcoming Services',
                           value: '${reminderProvider.upcomingReminders.length}',
-                          isDark: isDark,
+                          badgeText: 'Due Soon',
+                          badgeColor: AppColors.statAmber,
+                          accentColor: AppColors.statAmber,
+                          trendProgress: 0.60,
+                          onTap: () {
+                            if (widget.onNavigateTab != null) widget.onNavigateTab!(3);
+                          },
                         ),
-                        _buildStatCard(
-                          context,
-                          icon: Icons.build_outlined,
+                        StatCardWidget(
+                          icon: Icons.build_circle_rounded,
                           label: 'Total Services',
                           value: '${provider.totalServicesCount}',
-                          isDark: isDark,
+                          badgeText: 'Tracked',
+                          badgeColor: AppColors.primaryLight,
+                          accentColor: AppColors.primaryLight,
+                          trendProgress: 0.85,
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(builder: (_) => const ServiceHistoryScreen()),
+                            );
+                          },
                         ),
-                        _buildStatCard(
-                          context,
-                          icon: Icons.account_balance_wallet_outlined,
+                        StatCardWidget(
+                          icon: Icons.account_balance_wallet_rounded,
                           label: 'Total Spent',
                           value: totalSpentFormatted,
-                          isDark: isDark,
+                          badgeText: 'Total',
+                          badgeColor: AppColors.statBlue,
+                          accentColor: AppColors.statBlue,
+                          trendProgress: 0.45,
+                          onTap: () {
+                            if (widget.onNavigateTab != null) widget.onNavigateTab!(2);
+                          },
                         ),
-                        _buildStatCard(
-                          context,
-                          icon: Icons.event_available_outlined,
+                        StatCardWidget(
+                          icon: Icons.event_available_rounded,
                           label: 'Next Service',
-                          value: '12 days',
-                          isDark: isDark,
+                          value: '12 Days',
+                          badgeText: 'Scheduled',
+                          badgeColor: AppColors.statPurple,
+                          accentColor: AppColors.statPurple,
+                          trendProgress: 0.90,
+                          onTap: () {
+                            if (widget.onNavigateTab != null) widget.onNavigateTab!(3);
+                          },
                         ),
                       ],
                     ),
+                    const SizedBox(height: 22),
+
+                    // Vehicle Maintenance Pro Tips Text Card Section
+                    const MaintenanceTipCard(),
                     const SizedBox(height: 24),
+
 
                     // Search & Filter Header Row
                     Row(
@@ -529,77 +588,7 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget _buildStatCard(
-    BuildContext context, {
-    required IconData icon,
-    required String label,
-    required String value,
-    required bool isDark,
-  }) {
-    return Container(
-      padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(
-        color: isDark ? AppColors.darkCard : Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: isDark ? AppColors.darkBorder : AppColors.lightBorder,
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.02),
-            blurRadius: 8,
-            offset: const Offset(0, 3),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Row(
-            children: [
-              Container(
-                padding: const EdgeInsets.all(8),
-                decoration: BoxDecoration(
-                  color: AppColors.primaryLight.withValues(alpha: 0.12),
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                child: Icon(
-                  icon,
-                  size: 20,
-                  color: AppColors.primaryLight,
-                ),
-              ),
-              const Spacer(),
-            ],
-          ),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                label,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: TextStyle(
-                  fontSize: 12,
-                  color: isDark ? AppColors.darkTextSecondary : AppColors.lightTextSecondary,
-                ),
-              ),
-              const SizedBox(height: 2),
-              Text(
-                value,
-                style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                  color: isDark ? AppColors.darkTextPrimary : AppColors.lightTextPrimary,
-                ),
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
+
 
   Widget _buildFilterChip(
     BuildContext context,
