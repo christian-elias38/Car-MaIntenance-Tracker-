@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../data/models/vehicle_model.dart';
 import '../providers/vehicle_provider.dart';
+import 'app_vehicle_image.dart';
 
 class AddVehicleDialog extends StatefulWidget {
   final VehicleModel? vehicleToEdit;
@@ -165,7 +166,60 @@ class _AddVehicleDialogState extends State<AddVehicleDialog> with SingleTickerPr
     Navigator.pop(context);
   }
 
+  void _showCustomImageDialog(BuildContext context) {
+    final controller = TextEditingController(text: _selectedImagePath);
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Row(
+          children: [
+            Icon(Icons.add_a_photo_rounded, color: AppColors.primaryLight),
+            SizedBox(width: 8),
+            Text('Vehicle Image / Photo', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+          ],
+        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text(
+              'Enter a file path from your device or an image URL:',
+              style: TextStyle(fontSize: 13),
+            ),
+            const SizedBox(height: 12),
+            TextField(
+              controller: controller,
+              decoration: const InputDecoration(
+                hintText: 'e.g. C:/Photos/my_car.jpg or https://...',
+                prefixIcon: Icon(Icons.link_rounded),
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text('Cancel'),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              final text = controller.text.trim();
+              if (text.isNotEmpty) {
+                setState(() => _selectedImagePath = text);
+              }
+              Navigator.pop(ctx);
+            },
+            style: ElevatedButton.styleFrom(backgroundColor: AppColors.primaryLight),
+            child: const Text('Apply Image', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
+
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final isEdit = widget.vehicleToEdit != null;
@@ -330,12 +384,74 @@ class _AddVehicleDialogState extends State<AddVehicleDialog> with SingleTickerPr
                               );
                             }).toList(),
                           ),
-                          const SizedBox(height: 16),
+                          const SizedBox(height: 18),
+                          // Vehicle Photo / Graphic Selection Section
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                'Vehicle Graphic & Photo',
+                                style: TextStyle(
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.bold,
+                                  color: isDark ? AppColors.darkTextSecondary : AppColors.lightTextSecondary,
+                                ),
+                              ),
+                              OutlinedButton.icon(
+                                onPressed: () => _showCustomImageDialog(context),
+                                icon: const Icon(Icons.upload_file_rounded, size: 16),
+                                label: const Text('Upload / Choose', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
+                                style: OutlinedButton.styleFrom(
+                                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                                  side: const BorderSide(color: AppColors.primaryLight),
+                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 8),
+
+                          // Live Selected Image Preview Container
+                          Container(
+                            width: double.infinity,
+                            height: 110,
+                            decoration: BoxDecoration(
+                              color: isDark ? AppColors.darkSurface : AppColors.mintBackground.withValues(alpha: 0.5),
+                              borderRadius: BorderRadius.circular(16),
+                              border: Border.all(color: AppColors.primaryLight.withValues(alpha: 0.3)),
+                            ),
+                            child: Stack(
+                              children: [
+                                Positioned.fill(
+                                  child: AppVehicleImage(
+                                    imagePath: _selectedImagePath,
+                                    borderRadius: BorderRadius.circular(16),
+                                  ),
+                                ),
+                                Positioned(
+                                  top: 8,
+                                  right: 8,
+                                  child: Container(
+                                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                                    decoration: BoxDecoration(
+                                      color: Colors.black.withValues(alpha: 0.65),
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                    child: const Text(
+                                      'Active Choice',
+                                      style: TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          const SizedBox(height: 12),
+
                           Text(
-                            'Car Graphic Preset',
+                            'Or Select Preset Graphic Model:',
                             style: TextStyle(
-                              fontSize: 13,
-                              fontWeight: FontWeight.bold,
+                              fontSize: 12,
                               color: isDark ? AppColors.darkTextSecondary : AppColors.lightTextSecondary,
                             ),
                           ),
@@ -352,22 +468,19 @@ class _AddVehicleDialogState extends State<AddVehicleDialog> with SingleTickerPr
                                   onTap: () => setState(() => _selectedImagePath = preset['path']!),
                                   child: Container(
                                     margin: const EdgeInsets.only(right: 12),
-                                    padding: const EdgeInsets.all(4),
+                                    padding: const EdgeInsets.all(3),
                                     decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(12),
+                                      borderRadius: BorderRadius.circular(14),
                                       border: Border.all(
                                         color: isSel ? AppColors.primaryLight : Colors.transparent,
-                                        width: 2,
+                                        width: 2.5,
                                       ),
                                     ),
-                                    child: ClipRRect(
-                                      borderRadius: BorderRadius.circular(8),
-                                      child: Image.asset(
-                                        preset['path']!,
-                                        width: 70,
-                                        height: 50,
-                                        fit: BoxFit.cover,
-                                      ),
+                                    child: AppVehicleImage(
+                                      imagePath: preset['path']!,
+                                      width: 76,
+                                      height: 50,
+                                      borderRadius: BorderRadius.circular(10),
                                     ),
                                   ),
                                 );
