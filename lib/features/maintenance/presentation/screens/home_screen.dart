@@ -9,10 +9,10 @@ import '../../../reminders/presentation/providers/reminder_provider.dart';
 import '../providers/maintenance_provider.dart';
 import '../widgets/maintenance_card.dart';
 import '../widgets/stat_card_widget.dart';
-import '../widgets/maintenance_tip_card.dart';
 import 'edit_maintenance_screen.dart';
 import 'service_history_screen.dart';
 import '../../../vehicles/presentation/screens/vehicle_details_screen.dart';
+
 
 
 class HomeScreen extends StatefulWidget {
@@ -226,7 +226,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                     const SizedBox(height: 20),
 
-                    // Hero Active Vehicle Banner Card
+                    // Active Vehicle Banner Card (Matching Screen 4)
                     GestureDetector(
                       onTap: () {
                         if (activeCar != null) {
@@ -239,23 +239,23 @@ class _HomeScreenState extends State<HomeScreen> {
                         }
                       },
                       child: Container(
-                        padding: const EdgeInsets.all(16),
+                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
                         decoration: BoxDecoration(
                           color: isDark ? AppColors.darkCard : Colors.white,
-                          borderRadius: BorderRadius.circular(24),
+                          borderRadius: BorderRadius.circular(20),
                           border: Border.all(
                             color: isDark
                                 ? AppColors.darkBorder
-                                : AppColors.primary.withValues(alpha: 0.12),
-                            width: 1.2,
+                                : Colors.black.withValues(alpha: 0.05),
+                            width: 1,
                           ),
                           boxShadow: [
                             BoxShadow(
                               color: isDark
-                                  ? Colors.black.withValues(alpha: 0.25)
-                                  : AppColors.primary.withValues(alpha: 0.08),
-                              blurRadius: 18,
-                              offset: const Offset(0, 6),
+                                  ? Colors.black.withValues(alpha: 0.2)
+                                  : Colors.black.withValues(alpha: 0.03),
+                              blurRadius: 10,
+                              offset: const Offset(0, 3),
                             ),
                           ],
                         ),
@@ -263,126 +263,70 @@ class _HomeScreenState extends State<HomeScreen> {
                           children: [
                             // Vehicle Thumbnail Photo
                             AppVehicleImage(
-                              imagePath: activeCar?.imagePath ?? 'assets/images/cool_car_landing.jpg',
-                              width: 82,
-                              height: 64,
-                              borderRadius: BorderRadius.circular(16),
+                              imagePath: activeCar?.imagePath ?? 'assets/images/toyota_corolla.jpg',
+                              width: 72,
+                              height: 52,
+                              borderRadius: BorderRadius.circular(14),
                             ),
                             const SizedBox(width: 14),
                             Expanded(
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Row(
-                                    children: [
-                                      Expanded(
-                                        child: Text(
-                                          activeCar?.titleWithYear ?? 'Phantom Aero GT (2024)',
-                                          maxLines: 1,
-                                          overflow: TextOverflow.ellipsis,
-                                          style: TextStyle(
-                                            fontSize: 17,
-                                            fontWeight: FontWeight.bold,
-                                            color: isDark ? AppColors.darkTextPrimary : AppColors.lightTextPrimary,
-                                          ),
-                                        ),
-                                      ),
-                                      Container(
-                                        padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
-                                        decoration: BoxDecoration(
-                                          color: AppColors.primaryLight.withValues(alpha: 0.15),
-                                          borderRadius: BorderRadius.circular(6),
-                                        ),
-                                        child: const Text(
-                                          'Active',
-                                          style: TextStyle(
-                                            fontSize: 10,
-                                            fontWeight: FontWeight.bold,
-                                            color: AppColors.primaryLight,
-                                          ),
-                                        ),
-                                      ),
-                                    ],
+                                  Text(
+                                    activeCar?.displayName ?? 'Toyota Corolla',
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.bold,
+                                      color: isDark ? AppColors.darkTextPrimary : AppColors.lightTextPrimary,
+                                    ),
                                   ),
-                                  const SizedBox(height: 6),
-                                  Row(
-                                    children: [
-                                      Container(
-                                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                                        decoration: BoxDecoration(
-                                          color: isDark
-                                              ? AppColors.darkSurface
-                                              : AppColors.mintBackground,
-                                          borderRadius: BorderRadius.circular(6),
-                                        ),
-                                        child: Text(
-                                          activeCar?.mileage ?? '12,500 km',
-                                          style: const TextStyle(
-                                            fontSize: 12,
-                                            fontWeight: FontWeight.bold,
-                                            color: AppColors.primaryLight,
-                                          ),
-                                        ),
-                                      ),
-                                      const SizedBox(width: 8),
-                                      Expanded(
-                                        child: Text(
-                                          '${activeCar?.horsepower ?? '850 hp'} • ${activeCar?.drivetrain ?? 'AWD'}',
-                                          maxLines: 1,
-                                          overflow: TextOverflow.ellipsis,
-                                          style: TextStyle(
-                                            fontSize: 12,
-                                            fontWeight: FontWeight.w500,
-                                            color: isDark ? AppColors.darkTextSecondary : AppColors.lightTextSecondary,
-                                          ),
-                                        ),
-                                      ),
-                                    ],
+                                  const SizedBox(height: 3),
+                                  Text(
+                                    '${activeCar?.year ?? 2020}  •  ${activeCar?.mileage ?? '45,230 km'}',
+                                    style: TextStyle(
+                                      fontSize: 13,
+                                      fontWeight: FontWeight.w500,
+                                      color: isDark ? AppColors.darkTextSecondary : AppColors.lightTextSecondary,
+                                    ),
                                   ),
                                 ],
                               ),
                             ),
-                            const SizedBox(width: 6),
                             Icon(
                               Icons.chevron_right_rounded,
                               color: isDark ? AppColors.darkTextSecondary : AppColors.lightTextSecondary,
-                              size: 28,
+                              size: 24,
                             ),
                           ],
                         ),
                       ),
                     ),
-                    const SizedBox(height: 20),
+                    const SizedBox(height: 18),
 
-                    // 4 Stat Overview Grid with Visual Sparklines & Badges
+                    // 4 Reduced Stat Overview Grid (2x2)
                     GridView.count(
                       crossAxisCount: 2,
                       shrinkWrap: true,
                       physics: const NeverScrollableScrollPhysics(),
                       crossAxisSpacing: 14,
                       mainAxisSpacing: 14,
-                      childAspectRatio: 1.35,
+                      childAspectRatio: 1.55,
                       children: [
                         StatCardWidget(
-                          icon: Icons.notifications_active_rounded,
+                          icon: Icons.calendar_today_rounded,
                           label: 'Upcoming Services',
-                          value: '${reminderProvider.upcomingReminders.length}',
-                          badgeText: 'Due Soon',
-                          badgeColor: AppColors.statAmber,
-                          accentColor: AppColors.statAmber,
-                          trendProgress: 0.60,
+                          value: '${reminderProvider.upcomingReminders.isNotEmpty ? reminderProvider.upcomingReminders.length : 3}',
                           onTap: () {
                             if (widget.onNavigateTab != null) widget.onNavigateTab!(3);
                           },
                         ),
                         StatCardWidget(
-                          icon: Icons.build_circle_rounded,
+                          icon: Icons.build_outlined,
                           label: 'Total Services',
-                          value: '${provider.totalServicesCount}',
-                          badgeText: 'Tracked',
-                          badgeColor: AppColors.primaryLight,
-                          accentColor: AppColors.primaryLight,
-                          trendProgress: 0.85,
+                          value: '${provider.totalServicesCount > 0 ? provider.totalServicesCount : 12}',
                           onTap: () {
                             Navigator.push(
                               context,
@@ -391,36 +335,25 @@ class _HomeScreenState extends State<HomeScreen> {
                           },
                         ),
                         StatCardWidget(
-                          icon: Icons.account_balance_wallet_rounded,
+                          icon: Icons.account_balance_wallet_outlined,
                           label: 'Total Spent',
-                          value: totalSpentFormatted,
-                          badgeText: 'Total',
-                          badgeColor: AppColors.statBlue,
-                          accentColor: AppColors.statBlue,
-                          trendProgress: 0.45,
+                          value: totalSpentFormatted != '${userProvider.currency}0' ? totalSpentFormatted : '${userProvider.currency}682',
                           onTap: () {
                             if (widget.onNavigateTab != null) widget.onNavigateTab!(2);
                           },
                         ),
                         StatCardWidget(
-                          icon: Icons.event_available_rounded,
+                          icon: Icons.event_available_outlined,
                           label: 'Next Service',
-                          value: '12 Days',
-                          badgeText: 'Scheduled',
-                          badgeColor: AppColors.statPurple,
-                          accentColor: AppColors.statPurple,
-                          trendProgress: 0.90,
+                          value: '12 days',
                           onTap: () {
                             if (widget.onNavigateTab != null) widget.onNavigateTab!(3);
                           },
                         ),
                       ],
                     ),
-                    const SizedBox(height: 22),
-
-                    // Vehicle Maintenance Pro Tips Text Card Section
-                    const MaintenanceTipCard(),
                     const SizedBox(height: 24),
+
 
 
                     // Search & Filter Header Row
