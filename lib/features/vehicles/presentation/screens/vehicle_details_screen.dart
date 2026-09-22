@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../data/models/vehicle_model.dart';
 import '../widgets/add_vehicle_dialog.dart';
+import '../widgets/app_vehicle_image.dart';
 
 class VehicleDetailsScreen extends StatelessWidget {
   final VehicleModel vehicle;
@@ -57,14 +58,12 @@ class VehicleDetailsScreen extends StatelessWidget {
                         ),
                       ],
                     ),
-                    child: ClipRRect(
+                    child: AppVehicleImage(
+                      imagePath: vehicle.imagePath,
                       borderRadius: BorderRadius.circular(24),
-                      child: Image.asset(
-                        vehicle.imagePath,
-                        fit: BoxFit.cover,
-                      ),
                     ),
                   ),
+
 
                   // Overlay Gradient
                   Positioned.fill(
