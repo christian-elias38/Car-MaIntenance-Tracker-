@@ -17,28 +17,16 @@ class MaintenanceCard extends StatelessWidget {
   IconData _getCategoryIcon(String category) {
     final lower = category.toLowerCase();
     if (lower.contains('oil')) return Icons.water_drop_rounded;
-    if (lower.contains('tire')) return Icons.adjust_rounded;
+    if (lower.contains('tire')) return Icons.rotate_right_rounded;
     if (lower.contains('brake')) return Icons.disc_full_rounded;
     if (lower.contains('engine') || lower.contains('check')) return Icons.minor_crash_rounded;
     if (lower.contains('battery')) return Icons.battery_charging_full_rounded;
-    if (lower.contains('transmission')) return Icons.settings_suggest_rounded;
     return Icons.build_rounded;
-  }
-
-  Color _getCategoryColor(String category) {
-    final lower = category.toLowerCase();
-    if (lower.contains('oil')) return const Color(0xFF0EA5E9);
-    if (lower.contains('tire')) return const Color(0xFF8B5CF6);
-    if (lower.contains('brake')) return const Color(0xFFF59E0B);
-    if (lower.contains('engine')) return const Color(0xFFEF4444);
-    if (lower.contains('battery')) return const Color(0xFF10B981);
-    return AppColors.primaryLight;
   }
 
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final categoryColor = _getCategoryColor(record.serviceType);
 
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
@@ -46,155 +34,77 @@ class MaintenanceCard extends StatelessWidget {
         color: isDark ? AppColors.darkCard : AppColors.lightCard,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: isDark ? AppColors.darkBorder : AppColors.lightBorder,
+          color: isDark ? AppColors.darkBorder : Colors.black.withValues(alpha: 0.04),
           width: 1,
         ),
         boxShadow: isDark
             ? []
             : [
                 BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.03),
-                  blurRadius: 10,
-                  offset: const Offset(0, 4),
+                  color: Colors.black.withValues(alpha: 0.02),
+                  blurRadius: 8,
+                  offset: const Offset(0, 2),
                 ),
               ],
       ),
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Category Icon Badge
-            Container(
-              width: 48,
-              height: 48,
-              decoration: BoxDecoration(
-                color: categoryColor.withValues(alpha: 0.12),
-                shape: BoxShape.circle,
-              ),
-              child: Center(
-                child: Icon(
-                  _getCategoryIcon(record.serviceType),
-                  color: categoryColor,
-                  size: 24,
+      child: InkWell(
+        onTap: onEdit,
+        borderRadius: BorderRadius.circular(16),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+          child: Row(
+            children: [
+              // Green Circular Icon Badge
+              Container(
+                width: 44,
+                height: 44,
+                decoration: BoxDecoration(
+                  color: AppColors.primaryLight.withValues(alpha: 0.12),
+                  shape: BoxShape.circle,
+                ),
+                child: Center(
+                  child: Icon(
+                    _getCategoryIcon(record.serviceType),
+                    color: AppColors.primaryLight,
+                    size: 22,
+                  ),
                 ),
               ),
-            ),
-            const SizedBox(width: 14),
+              const SizedBox(width: 14),
 
-            // Content Column
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        record.serviceType,
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                          color: isDark ? AppColors.darkTextPrimary : AppColors.lightTextPrimary,
-                        ),
-                      ),
-                      Text(
-                        '\$${record.cost}',
-                        style: const TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                          color: AppColors.primaryLight,
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 4),
-
-                  // Car Name & Mileage
-                  Row(
-                    children: [
-                      Text(
-                        record.carName,
-                        style: TextStyle(
-                          fontSize: 13,
-                          color: isDark ? AppColors.darkTextSecondary : AppColors.lightTextSecondary,
-                        ),
-                      ),
-                      if (record.mileage.isNotEmpty) ...[
-                        Text(
-                          ' • ',
-                          style: TextStyle(
-                            color: isDark ? AppColors.darkTextSecondary : AppColors.lightTextSecondary,
-                          ),
-                        ),
-                        Text(
-                          record.mileage,
-                          style: TextStyle(
-                            fontSize: 13,
-                            color: isDark ? AppColors.darkTextSecondary : AppColors.lightTextSecondary,
-                          ),
-                        ),
-                      ],
-                    ],
-                  ),
-                  const SizedBox(height: 6),
-
-                  // Date & Notes
-                  Row(
-                    children: [
-                      Icon(
-                        Icons.calendar_today_outlined,
-                        size: 13,
-                        color: isDark ? AppColors.darkTextSecondary : AppColors.lightTextSecondary,
-                      ),
-                      const SizedBox(width: 4),
-                      Text(
-                        record.date,
-                        style: TextStyle(
-                          fontSize: 12,
-                          color: isDark ? AppColors.darkTextSecondary : AppColors.lightTextSecondary,
-                        ),
-                      ),
-                    ],
-                  ),
-                  if (record.notes.isNotEmpty) ...[
-                    const SizedBox(height: 6),
+              // Content Column (Title & Date + Mileage)
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
                     Text(
-                      record.notes,
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
+                      record.serviceType,
                       style: TextStyle(
-                        fontSize: 12,
-                        fontStyle: FontStyle.italic,
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color: isDark ? AppColors.darkTextPrimary : AppColors.lightTextPrimary,
+                      ),
+                    ),
+                    const SizedBox(height: 3),
+                    Text(
+                      '${record.date}${record.mileage.isNotEmpty ? '  •  ${record.mileage}' : ''}',
+                      style: TextStyle(
+                        fontSize: 13,
                         color: isDark ? AppColors.darkTextSecondary : AppColors.lightTextSecondary,
                       ),
                     ),
                   ],
-                ],
+                ),
               ),
-            ),
 
-            // Action Buttons Popup / Icons
-            Column(
-              children: [
-                IconButton(
-                  icon: const Icon(Icons.edit_outlined, size: 20),
-                  color: isDark ? AppColors.darkTextSecondary : AppColors.lightTextSecondary,
-                  constraints: const BoxConstraints(),
-                  padding: const EdgeInsets.all(4),
-                  onPressed: onEdit,
-                ),
-                const SizedBox(height: 8),
-                IconButton(
-                  icon: const Icon(Icons.delete_outline, size: 20),
-                  color: AppColors.danger,
-                  constraints: const BoxConstraints(),
-                  padding: const EdgeInsets.all(4),
-                  onPressed: onDelete,
-                ),
-              ],
-            ),
-          ],
+              // Right chevron
+              Icon(
+                Icons.chevron_right_rounded,
+                color: isDark ? AppColors.darkTextSecondary : AppColors.lightTextSecondary,
+                size: 22,
+              ),
+            ],
+          ),
         ),
       ),
     );
