@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../providers/vehicle_provider.dart';
 import '../widgets/add_vehicle_dialog.dart';
+import '../widgets/app_vehicle_image.dart';
 import '../../data/models/vehicle_model.dart';
 import 'vehicle_details_screen.dart';
 
@@ -113,19 +114,11 @@ class VehiclesScreen extends StatelessWidget {
                   child: Row(
                     children: [
                       // Car Thumbnail Photo
-                      Container(
+                      AppVehicleImage(
+                        imagePath: vehicle.imagePath,
                         width: 84,
                         height: 64,
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(16),
-                        ),
-                        child: ClipRRect(
-                          borderRadius: BorderRadius.circular(16),
-                          child: Image.asset(
-                            vehicle.imagePath,
-                            fit: BoxFit.cover,
-                          ),
-                        ),
+                        borderRadius: BorderRadius.circular(16),
                       ),
                       const SizedBox(width: 16),
 
