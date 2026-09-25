@@ -25,6 +25,7 @@ class VehicleModel {
   final String policyNumber;
   final String serviceCenter;
   final String notes;
+  final String description;
   final String imagePath;
 
   VehicleModel({
@@ -52,6 +53,7 @@ class VehicleModel {
     this.policyNumber = '',
     this.serviceCenter = 'Authorized Service Center',
     this.notes = '',
+    this.description = '',
     this.imagePath = 'assets/images/cool_car_landing.jpg',
   });
 
@@ -84,6 +86,7 @@ class VehicleModel {
       policyNumber: json['policyNumber'] ?? '',
       serviceCenter: json['serviceCenter'] ?? 'Authorized Service Center',
       notes: json['notes'] ?? '',
+      description: json['description'] ?? '',
       imagePath: json['imagePath'] ?? 'assets/images/cool_car_landing.jpg',
     );
   }
@@ -114,6 +117,7 @@ class VehicleModel {
       'policyNumber': policyNumber,
       'serviceCenter': serviceCenter,
       'notes': notes,
+      'description': description,
       'imagePath': imagePath,
     };
   }
@@ -143,6 +147,7 @@ class VehicleModel {
     String? policyNumber,
     String? serviceCenter,
     String? notes,
+    String? description,
     String? imagePath,
   }) {
     return VehicleModel(
@@ -170,6 +175,7 @@ class VehicleModel {
       policyNumber: policyNumber ?? this.policyNumber,
       serviceCenter: serviceCenter ?? this.serviceCenter,
       notes: notes ?? this.notes,
+      description: description ?? this.description,
       imagePath: imagePath ?? this.imagePath,
     );
   }
