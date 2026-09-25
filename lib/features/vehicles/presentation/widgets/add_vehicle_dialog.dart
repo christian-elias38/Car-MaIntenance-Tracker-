@@ -1,6 +1,9 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 import '../../../../core/theme/app_colors.dart';
+import '../../../ai_assistant/data/services/ai_recommendation_service.dart';
 import '../../data/models/vehicle_model.dart';
 import '../providers/vehicle_provider.dart';
 import 'app_vehicle_image.dart';
@@ -26,6 +29,7 @@ class _AddVehicleDialogState extends State<AddVehicleDialog> with SingleTickerPr
   late TextEditingController _colorController;
   late TextEditingController _licensePlateController;
   late TextEditingController _mileageController;
+  late TextEditingController _descriptionController;
 
   // Engine & Performance Controllers
   late TextEditingController _engineSizeController;
@@ -74,6 +78,7 @@ class _AddVehicleDialogState extends State<AddVehicleDialog> with SingleTickerPr
     _colorController = TextEditingController(text: v?.color ?? 'Midnight Black');
     _licensePlateController = TextEditingController(text: v?.licensePlate ?? '');
     _mileageController = TextEditingController(text: v?.mileage.replaceAll(RegExp(r'[^0-9]'), '') ?? '15000');
+    _descriptionController = TextEditingController(text: v?.description ?? '');
 
     _engineSizeController = TextEditingController(text: v?.engineSize ?? '2.0L 4-Cylinder');
     _hpController = TextEditingController(text: v?.horsepower ?? '200 hp');
@@ -106,6 +111,7 @@ class _AddVehicleDialogState extends State<AddVehicleDialog> with SingleTickerPr
     _colorController.dispose();
     _licensePlateController.dispose();
     _mileageController.dispose();
+    _descriptionController.dispose();
 
     _engineSizeController.dispose();
     _hpController.dispose();
@@ -120,6 +126,200 @@ class _AddVehicleDialogState extends State<AddVehicleDialog> with SingleTickerPr
     _serviceCenterController.dispose();
     _notesController.dispose();
     super.dispose();
+  }
+
+  void _generateAiDescription() {
+    final tempVehicle = VehicleModel(
+      id: 'temp',
+      make: _makeController.text.isEmpty ? 'Vehicle' : _makeController.text,
+      model: _modelController.text,
+      year: int.tryParse(_yearController.text) ?? 2024,
+      trim: _trimController.text,
+      vin: '',
+      mileage: '${_mileageController.text} km',
+      bodyType: _bodyType,
+      engineSize: _engineSizeController.text,
+      horsepower: _hpController.text,
+      transmission: _transmission,
+      drivetrain: _drivetrain,
+      oilType: _oilTypeController.text,
+    );
+
+    final aiDescription = AiRecommendationService().generateAutoDescription(tempVehicle);
+    setState(() {
+      _descriptionController.text = aiDescription;
+    });
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('✨ AI generated vehicle description applied!'),
+        backgroundColor: AppColors.primaryLight,
+        duration: Duration(seconds: 2),
+      ),
+    );
+  }
+
+  Future<void> _pickImage(ImageSource source) async {
+    try {
+      final picker = ImagePicker();
+      final XFile? image = await picker.pickImage(
+        source: source,
+        maxWidth: 1200,
+        maxHeight: 1200,
+        imageQuality: 85,
+      );
+
+      if (image != null) {
+        final bytes = await image.readAsBytes();
+        final base64String = 'data:image/png;base64,${base64Encode(bytes)}';
+        setState(() {
+          _selectedImagePath = base64String;
+        });
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('📷 Vehicle photo uploaded successfully!'),
+              backgroundColor: AppColors.primaryLight,
+            ),
+          );
+        }
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Image upload note: $e'), backgroundColor: AppColors.warning),
+        );
+      }
+    }
+  }
+
+  void _showImageOptionsModal(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      ),
+      builder: (ctx) => Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Row(
+              children: [
+                Icon(Icons.add_a_photo_rounded, color: AppColors.primaryLight),
+                SizedBox(width: 10),
+                Text(
+                  'Upload / Choose Vehicle Photo',
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                ),
+              ],
+            ),
+            const SizedBox(height: 16),
+            ListTile(
+              leading: Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: AppColors.primaryLight.withValues(alpha: 0.15),
+                  shape: BoxShape.circle,
+                ),
+                child: const Icon(Icons.photo_library_rounded, color: AppColors.primaryLight),
+              ),
+              title: const Text('Choose from Photo Gallery', style: TextStyle(fontWeight: FontWeight.bold)),
+              subtitle: const Text('Select a saved car photo from your device'),
+              onTap: () {
+                Navigator.pop(ctx);
+                _pickImage(ImageSource.gallery);
+              },
+            ),
+            ListTile(
+              leading: Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: AppColors.info.withValues(alpha: 0.15),
+                  shape: BoxShape.circle,
+                ),
+                child: const Icon(Icons.camera_alt_rounded, color: AppColors.info),
+              ),
+              title: const Text('Take Photo with Camera', style: TextStyle(fontWeight: FontWeight.bold)),
+              subtitle: const Text('Capture a picture of your vehicle directly'),
+              onTap: () {
+                Navigator.pop(ctx);
+                _pickImage(ImageSource.camera);
+              },
+            ),
+            ListTile(
+              leading: Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: AppColors.accent.withValues(alpha: 0.15),
+                  shape: BoxShape.circle,
+                ),
+                child: const Icon(Icons.link_rounded, color: AppColors.accent),
+              ),
+              title: const Text('Enter Web Image URL or File Path', style: TextStyle(fontWeight: FontWeight.bold)),
+              subtitle: const Text('Paste https:// link or local file path'),
+              onTap: () {
+                Navigator.pop(ctx);
+                _showCustomImageDialog(context);
+              },
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _showCustomImageDialog(BuildContext context) {
+    final controller = TextEditingController(text: _selectedImagePath);
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Row(
+          children: [
+            Icon(Icons.link_rounded, color: AppColors.primaryLight),
+            SizedBox(width: 8),
+            Text('Vehicle Image URL / Path', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+          ],
+        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text(
+              'Enter a custom image web link (https://) or local file path:',
+              style: TextStyle(fontSize: 13),
+            ),
+            const SizedBox(height: 12),
+            TextField(
+              controller: controller,
+              decoration: const InputDecoration(
+                hintText: 'e.g. https://images.unsplash.com/car.jpg',
+                prefixIcon: Icon(Icons.image_outlined),
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text('Cancel'),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              final text = controller.text.trim();
+              if (text.isNotEmpty) {
+                setState(() => _selectedImagePath = text);
+              }
+              Navigator.pop(ctx);
+            },
+            style: ElevatedButton.styleFrom(backgroundColor: AppColors.primaryLight),
+            child: const Text('Apply Image', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+          ),
+        ],
+      ),
+    );
   }
 
   void _submit() {
@@ -153,6 +353,7 @@ class _AddVehicleDialogState extends State<AddVehicleDialog> with SingleTickerPr
       policyNumber: _policyNumberController.text.trim(),
       serviceCenter: _serviceCenterController.text.trim(),
       notes: _notesController.text.trim(),
+      description: _descriptionController.text.trim(),
       imagePath: _selectedImagePath,
     );
 
@@ -166,60 +367,7 @@ class _AddVehicleDialogState extends State<AddVehicleDialog> with SingleTickerPr
     Navigator.pop(context);
   }
 
-  void _showCustomImageDialog(BuildContext context) {
-    final controller = TextEditingController(text: _selectedImagePath);
-    showDialog(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        title: const Row(
-          children: [
-            Icon(Icons.add_a_photo_rounded, color: AppColors.primaryLight),
-            SizedBox(width: 8),
-            Text('Vehicle Image / Photo', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-          ],
-        ),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text(
-              'Enter a file path from your device or an image URL:',
-              style: TextStyle(fontSize: 13),
-            ),
-            const SizedBox(height: 12),
-            TextField(
-              controller: controller,
-              decoration: const InputDecoration(
-                hintText: 'e.g. C:/Photos/my_car.jpg or https://...',
-                prefixIcon: Icon(Icons.link_rounded),
-              ),
-            ),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(ctx),
-            child: const Text('Cancel'),
-          ),
-          ElevatedButton(
-            onPressed: () {
-              final text = controller.text.trim();
-              if (text.isNotEmpty) {
-                setState(() => _selectedImagePath = text);
-              }
-              Navigator.pop(ctx);
-            },
-            style: ElevatedButton.styleFrom(backgroundColor: AppColors.primaryLight),
-            child: const Text('Apply Image', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
-          ),
-        ],
-      ),
-    );
-  }
-
   @override
-
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final isEdit = widget.vehicleToEdit != null;
@@ -229,7 +377,7 @@ class _AddVehicleDialogState extends State<AddVehicleDialog> with SingleTickerPr
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(28)),
       backgroundColor: isDark ? AppColors.darkCard : Colors.white,
       child: Container(
-        constraints: const BoxConstraints(maxWidth: 540, maxHeight: 720),
+        constraints: const BoxConstraints(maxWidth: 540, maxHeight: 750),
         child: Form(
           key: _formKey,
           child: Column(
@@ -252,7 +400,7 @@ class _AddVehicleDialogState extends State<AddVehicleDialog> with SingleTickerPr
                         ),
                         const SizedBox(width: 12),
                         Text(
-                          isEdit ? 'Edit Specific Details' : 'Add New Vehicle',
+                          isEdit ? 'Edit Vehicle Details' : 'Add New Vehicle',
                           style: TextStyle(
                             fontSize: 20,
                             fontWeight: FontWeight.bold,
@@ -277,7 +425,7 @@ class _AddVehicleDialogState extends State<AddVehicleDialog> with SingleTickerPr
                 unselectedLabelColor: isDark ? AppColors.darkTextSecondary : AppColors.lightTextSecondary,
                 labelStyle: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
                 tabs: const [
-                  Tab(icon: Icon(Icons.info_outline, size: 18), text: '1. Basic'),
+                  Tab(icon: Icon(Icons.info_outline, size: 18), text: '1. Basic & Desc'),
                   Tab(icon: Icon(Icons.speed, size: 18), text: '2. Specs'),
                   Tab(icon: Icon(Icons.verified_user_outlined, size: 18), text: '3. Legal & Maint.'),
                 ],
@@ -289,7 +437,7 @@ class _AddVehicleDialogState extends State<AddVehicleDialog> with SingleTickerPr
                 child: TabBarView(
                   controller: _tabController,
                   children: [
-                    // TAB 1: BASIC DETAILS
+                    // TAB 1: BASIC DETAILS & FULL DESCRIPTION & PHOTO UPLOAD
                     SingleChildScrollView(
                       padding: const EdgeInsets.all(20),
                       child: Column(
@@ -360,6 +508,39 @@ class _AddVehicleDialogState extends State<AddVehicleDialog> with SingleTickerPr
                             decoration: const InputDecoration(labelText: 'Exterior Color', hintText: 'e.g. Midnight Black / Carbon'),
                           ),
                           const SizedBox(height: 16),
+
+                          // Full Vehicle Description Section with AI generator button
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                'Full Vehicle Description',
+                                style: TextStyle(
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.bold,
+                                  color: isDark ? AppColors.darkTextSecondary : AppColors.lightTextSecondary,
+                                ),
+                              ),
+                              TextButton.icon(
+                                onPressed: _generateAiDescription,
+                                icon: const Icon(Icons.auto_awesome, size: 14, color: AppColors.primaryLight),
+                                label: const Text(
+                                  '✨ AI Auto-Description',
+                                  style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: AppColors.primaryLight),
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 4),
+                          TextFormField(
+                            controller: _descriptionController,
+                            maxLines: 3,
+                            decoration: const InputDecoration(
+                              hintText: 'Enter full description, features, package details, or tap AI Auto-Description...',
+                            ),
+                          ),
+                          const SizedBox(height: 16),
+
                           Text(
                             'Body Style',
                             style: TextStyle(
@@ -385,40 +566,41 @@ class _AddVehicleDialogState extends State<AddVehicleDialog> with SingleTickerPr
                             }).toList(),
                           ),
                           const SizedBox(height: 18),
-                          // Vehicle Photo / Graphic Selection Section
+
+                          // Upload Photo Header & Actions
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               Text(
-                                'Vehicle Graphic & Photo',
+                                'Vehicle Photo & Graphic',
                                 style: TextStyle(
                                   fontSize: 13,
                                   fontWeight: FontWeight.bold,
                                   color: isDark ? AppColors.darkTextSecondary : AppColors.lightTextSecondary,
                                 ),
                               ),
-                              OutlinedButton.icon(
-                                onPressed: () => _showCustomImageDialog(context),
-                                icon: const Icon(Icons.upload_file_rounded, size: 16),
-                                label: const Text('Upload / Choose', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
-                                style: OutlinedButton.styleFrom(
-                                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                                  side: const BorderSide(color: AppColors.primaryLight),
+                              ElevatedButton.icon(
+                                onPressed: () => _showImageOptionsModal(context),
+                                icon: const Icon(Icons.add_a_photo_rounded, size: 16, color: Colors.white),
+                                label: const Text('Upload Photo', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Colors.white)),
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: AppColors.primaryLight,
+                                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                                 ),
                               ),
                             ],
                           ),
-                          const SizedBox(height: 8),
+                          const SizedBox(height: 10),
 
-                          // Live Selected Image Preview Container
+                          // Image Preview Container
                           Container(
                             width: double.infinity,
-                            height: 110,
+                            height: 120,
                             decoration: BoxDecoration(
                               color: isDark ? AppColors.darkSurface : AppColors.mintBackground.withValues(alpha: 0.5),
                               borderRadius: BorderRadius.circular(16),
-                              border: Border.all(color: AppColors.primaryLight.withValues(alpha: 0.3)),
+                              border: Border.all(color: AppColors.primaryLight.withValues(alpha: 0.4)),
                             ),
                             child: Stack(
                               children: [
@@ -432,14 +614,20 @@ class _AddVehicleDialogState extends State<AddVehicleDialog> with SingleTickerPr
                                   top: 8,
                                   right: 8,
                                   child: Container(
-                                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                                     decoration: BoxDecoration(
-                                      color: Colors.black.withValues(alpha: 0.65),
+                                      color: Colors.black.withValues(alpha: 0.7),
                                       borderRadius: BorderRadius.circular(8),
                                     ),
-                                    child: const Text(
-                                      'Active Choice',
-                                      style: TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold),
+                                    child: const Row(
+                                      children: [
+                                        Icon(Icons.check_circle_rounded, color: AppColors.primaryLight, size: 12),
+                                        SizedBox(width: 4),
+                                        Text(
+                                          'Selected Photo',
+                                          style: TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold),
+                                        ),
+                                      ],
                                     ),
                                   ),
                                 ),
