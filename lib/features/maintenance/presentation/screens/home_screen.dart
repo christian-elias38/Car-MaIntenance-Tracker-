@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/theme_provider.dart';
+import '../../../ai_assistant/presentation/screens/ai_assistant_screen.dart';
+import '../../../ai_assistant/presentation/widgets/ai_vehicle_banner.dart';
 import '../../../profile/presentation/providers/user_provider.dart';
 import '../../../vehicles/presentation/providers/vehicle_provider.dart';
 import '../../../vehicles/presentation/widgets/app_vehicle_image.dart';
@@ -128,6 +130,34 @@ class _HomeScreenState extends State<HomeScreen> {
                         ),
                         Row(
                           children: [
+                            // AI Advisor Action Button
+                            Container(
+                              decoration: BoxDecoration(
+                                color: isDark ? AppColors.darkSurface : AppColors.lightSurface,
+                                shape: BoxShape.circle,
+                                border: Border.all(
+                                  color: isDark ? AppColors.darkBorder : AppColors.lightBorder,
+                                ),
+                              ),
+                              child: IconButton(
+                                tooltip: 'AI Vehicle Advisor',
+                                icon: const Icon(
+                                  Icons.auto_awesome,
+                                  size: 20,
+                                  color: AppColors.primaryLight,
+                                ),
+                                onPressed: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (_) => AiAssistantScreen(initialVehicle: activeCar),
+                                    ),
+                                  );
+                                },
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+
                             // Quick Theme Mode Toggle Button (Light / Dark / System)
                             Container(
                               decoration: BoxDecoration(
@@ -304,6 +334,10 @@ class _HomeScreenState extends State<HomeScreen> {
                         ),
                       ),
                     ),
+                    const SizedBox(height: 14),
+
+                    // AI Vehicle Care Advisor Banner
+                    AiVehicleBanner(vehicle: activeCar),
                     const SizedBox(height: 18),
 
                     // 4 Reduced Stat Overview Grid (2x2)
