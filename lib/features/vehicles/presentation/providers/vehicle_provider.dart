@@ -66,6 +66,7 @@ class VehicleProvider extends ChangeNotifier {
           policyNumber: 'SF-10029384',
           serviceCenter: 'Toyota Service Hub',
           notes: 'Regular oil changes done every 5,000 km.',
+          description: 'Reliable 4-door compact sedan featuring Toyota Safety Sense 2.0, dynamic force 2.0L engine, and impressive fuel efficiency ideal for daily commuting and long trips.',
           imagePath: 'assets/images/toyota_corolla.jpg',
         ),
         VehicleModel(
@@ -93,6 +94,7 @@ class VehicleProvider extends ChangeNotifier {
           policyNumber: 'GC-992011',
           serviceCenter: 'Honda Care Center',
           notes: 'Reliable commuter car.',
+          description: 'Sleek 10th gen EX sedan equipped with Honda Sensing suite, touchscreen infotainment, smooth CVT transmission, and responsive sporty handling.',
           imagePath: 'assets/images/honda_civic.jpg',
         ),
       ];
