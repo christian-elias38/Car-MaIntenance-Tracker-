@@ -4,6 +4,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../ai_assistant/data/services/ai_recommendation_service.dart';
+import '../../../ai_assistant/presentation/widgets/ai_image_generator_dialog.dart';
 import '../../data/models/vehicle_model.dart';
 import '../providers/vehicle_provider.dart';
 import 'app_vehicle_image.dart';
@@ -210,7 +211,7 @@ class _AddVehicleDialogState extends State<AddVehicleDialog> with SingleTickerPr
                 Icon(Icons.add_a_photo_rounded, color: AppColors.primaryLight),
                 SizedBox(width: 10),
                 Text(
-                  'Upload / Choose Vehicle Photo',
+                  'Upload / Generate Vehicle Photo',
                   style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                 ),
               ],
@@ -223,9 +224,35 @@ class _AddVehicleDialogState extends State<AddVehicleDialog> with SingleTickerPr
                   color: AppColors.primaryLight.withValues(alpha: 0.15),
                   shape: BoxShape.circle,
                 ),
-                child: const Icon(Icons.photo_library_rounded, color: AppColors.primaryLight),
+                child: const Icon(Icons.auto_awesome_rounded, color: AppColors.primaryLight),
               ),
-              title: const Text('Choose from Photo Gallery', style: TextStyle(fontWeight: FontWeight.bold)),
+              title: const Text('✨ Generate AI Vehicle Photo', style: TextStyle(fontWeight: FontWeight.bold)),
+              subtitle: const Text('Synthesize custom AI vehicle graphic or concept art'),
+              onTap: () async {
+                Navigator.pop(ctx);
+                final generatedData = await showDialog<String>(
+                  context: context,
+                  builder: (_) => AiImageGeneratorDialog(
+                    initialMake: _makeController.text.isNotEmpty ? _makeController.text : 'Porsche',
+                    initialModel: _modelController.text.isNotEmpty ? _modelController.text : 'GT',
+                    initialColor: _colorController.text.isNotEmpty ? _colorController.text : 'Emerald',
+                  ),
+                );
+                if (generatedData != null && generatedData.isNotEmpty) {
+                  setState(() => _selectedImagePath = generatedData);
+                }
+              },
+            ),
+            ListTile(
+              leading: Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: AppColors.info.withValues(alpha: 0.15),
+                  shape: BoxShape.circle,
+                ),
+                child: const Icon(Icons.photo_library_rounded, color: AppColors.info),
+              ),
+              title: const Text('Upload from Device Gallery', style: TextStyle(fontWeight: FontWeight.bold)),
               subtitle: const Text('Select a saved car photo from your device'),
               onTap: () {
                 Navigator.pop(ctx);
@@ -236,10 +263,10 @@ class _AddVehicleDialogState extends State<AddVehicleDialog> with SingleTickerPr
               leading: Container(
                 padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
-                  color: AppColors.info.withValues(alpha: 0.15),
+                  color: AppColors.accent.withValues(alpha: 0.15),
                   shape: BoxShape.circle,
                 ),
-                child: const Icon(Icons.camera_alt_rounded, color: AppColors.info),
+                child: const Icon(Icons.camera_alt_rounded, color: AppColors.accent),
               ),
               title: const Text('Take Photo with Camera', style: TextStyle(fontWeight: FontWeight.bold)),
               subtitle: const Text('Capture a picture of your vehicle directly'),
@@ -252,10 +279,10 @@ class _AddVehicleDialogState extends State<AddVehicleDialog> with SingleTickerPr
               leading: Container(
                 padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
-                  color: AppColors.accent.withValues(alpha: 0.15),
+                  color: Colors.purple.withValues(alpha: 0.15),
                   shape: BoxShape.circle,
                 ),
-                child: const Icon(Icons.link_rounded, color: AppColors.accent),
+                child: const Icon(Icons.link_rounded, color: Colors.purple),
               ),
               title: const Text('Enter Web Image URL or File Path', style: TextStyle(fontWeight: FontWeight.bold)),
               subtitle: const Text('Paste https:// link or local file path'),
