@@ -17,17 +17,17 @@ class AppColors {
   static const Color darkTextPrimary = Color(0xFFF1F5F9);
   static const Color darkTextSecondary = Color(0xFF94A3B8);
 
-  // Classy Light Mode Palette
-  static const Color lightBackground = Color(0xFFF4F7F5);
-  static const Color lightSurface = Color(0xFFFFFFFF);
-  static const Color lightCard = Color(0xFFFFFFFF);
-  static const Color lightCardSecondary = Color(0xFFF8FAF9);
-  static const Color lightBorder = Color(0xFFE2E8F0);
-  static const Color lightTextPrimary = Color(0xFF0F172A);
-  static const Color lightTextSecondary = Color(0xFF64748B);
+  // Classy Light Mode Palette (Distinct contrast to prevent background & component overlap)
+  static const Color lightBackground = Color(0xFFEFF3F1); // Soft cool slate green background
+  static const Color lightSurface = Color(0xFFFFFFFF);    // Crisp white surface
+  static const Color lightCard = Color(0xFFFFFFFF);       // White card surface
+  static const Color lightCardSecondary = Color(0xFFF7FAF8); // Off-white card container
+  static const Color lightBorder = Color(0xFFD0DDD7);      // Distinct border color for clear card boundaries
+  static const Color lightTextPrimary = Color(0xFF0F172A);  // Deep slate primary text
+  static const Color lightTextSecondary = Color(0xFF475569); // Muted secondary text
   static const Color lightGlow = Color(0x0F0F4C3A);
 
-  // Stat Card Accents
+  // Stat Card Accents (Vibrant & Distinct)
   static const Color statEmerald = Color(0xFF10B981);
   static const Color statAmber = Color(0xFFF59E0B);
   static const Color statBlue = Color(0xFF3B82F6);
@@ -40,4 +40,5 @@ class AppColors {
   static const Color danger = Color(0xFFEF4444);
   static const Color info = Color(0xFF3B82F6);
 }
+
 
