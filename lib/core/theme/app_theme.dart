@@ -32,17 +32,17 @@ class AppTheme {
       ),
       cardTheme: CardThemeData(
         color: AppColors.lightCard,
-        elevation: 2,
-        shadowColor: AppColors.primary.withValues(alpha: 0.06),
+        elevation: 3,
+        shadowColor: Colors.black.withValues(alpha: 0.06),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(20),
-          side: BorderSide(color: AppColors.primary.withValues(alpha: 0.08), width: 1),
+          side: const BorderSide(color: AppColors.lightBorder, width: 1.2),
         ),
       ),
       chipTheme: ChipThemeData(
         backgroundColor: AppColors.mintBackground,
         selectedColor: AppColors.primaryLight,
-        side: BorderSide.none,
+        side: const BorderSide(color: AppColors.lightBorder, width: 1),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         labelStyle: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13),
       ),
@@ -56,11 +56,11 @@ class AppTheme {
         prefixIconColor: AppColors.primary,
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(16),
-          borderSide: const BorderSide(color: AppColors.lightBorder),
+          borderSide: const BorderSide(color: AppColors.lightBorder, width: 1.2),
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(16),
-          borderSide: const BorderSide(color: AppColors.lightBorder),
+          borderSide: const BorderSide(color: AppColors.lightBorder, width: 1.2),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(16),
