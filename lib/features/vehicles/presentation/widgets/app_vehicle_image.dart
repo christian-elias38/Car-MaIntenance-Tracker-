@@ -28,9 +28,9 @@ class AppVehicleImage extends StatelessWidget {
 
     if (trimmedPath.startsWith('data:image') || _isBase64(trimmedPath)) {
       try {
-        final String cleanBase64 = trimmedPath.contains(',') 
+        final String cleanBase64 = (trimmedPath.contains(',') 
             ? trimmedPath.split(',').last 
-            : trimmedPath;
+            : trimmedPath).replaceAll(RegExp(r'\s+'), '');
         final bytes = base64Decode(cleanBase64);
         imageWidget = Image.memory(
           bytes,
@@ -60,16 +60,20 @@ class AppVehicleImage extends StatelessWidget {
       );
     } else if (trimmedPath.isNotEmpty) {
       if (!kIsWeb) {
-        final file = File(trimmedPath);
-        if (file.existsSync()) {
-          imageWidget = Image.file(
-            file,
-            width: width,
-            height: height,
-            fit: fit,
-            errorBuilder: (ctx, err, stack) => _buildFallback(context),
-          );
-        } else {
+        try {
+          final file = File(trimmedPath);
+          if (file.existsSync()) {
+            imageWidget = Image.file(
+              file,
+              width: width,
+              height: height,
+              fit: fit,
+              errorBuilder: (ctx, err, stack) => _buildFallback(context),
+            );
+          } else {
+            imageWidget = _buildFallback(context);
+          }
+        } catch (_) {
           imageWidget = _buildFallback(context);
         }
       } else {
@@ -90,9 +94,9 @@ class AppVehicleImage extends StatelessWidget {
   }
 
   bool _isBase64(String str) {
-    if (str.length < 100) return false;
-    final clean = str.contains(',') ? str.split(',').last : str;
-    return RegExp(r'^[A-Za-z0-9+/=]+$').hasMatch(clean.replaceAll(RegExp(r'\s+'), ''));
+    if (str.length < 50) return false;
+    final clean = (str.contains(',') ? str.split(',').last : str).replaceAll(RegExp(r'\s+'), '');
+    return RegExp(r'^[A-Za-z0-9+/=]+$').hasMatch(clean);
   }
 
   Widget _buildFallback(BuildContext context) {
