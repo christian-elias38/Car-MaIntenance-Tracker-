@@ -31,14 +31,14 @@ class StatCardWidget extends StatelessWidget {
           border: Border.all(
             color: isDark
                 ? AppColors.darkBorder
-                : Colors.black.withValues(alpha: 0.05),
-            width: 1,
+                : AppColors.lightBorder,
+            width: 1.2,
           ),
           boxShadow: [
             BoxShadow(
               color: isDark
-                  ? Colors.black.withValues(alpha: 0.2)
-                  : Colors.black.withValues(alpha: 0.03),
+                  ? Colors.black.withValues(alpha: 0.25)
+                  : accentColor.withValues(alpha: 0.08),
               blurRadius: 10,
               offset: const Offset(0, 3),
             ),
@@ -48,19 +48,23 @@ class StatCardWidget extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            // Top Row: Light Green Icon Badge + Label Text
+            // Top Row: Icon Badge + Label Text
             Row(
               children: [
                 Container(
                   padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
-                    color: AppColors.primaryLight.withValues(alpha: 0.12),
+                    color: accentColor.withValues(alpha: 0.15),
                     borderRadius: BorderRadius.circular(10),
+                    border: Border.all(
+                      color: accentColor.withValues(alpha: 0.25),
+                      width: 1,
+                    ),
                   ),
                   child: Icon(
                     icon,
-                    size: 20,
-                    color: AppColors.primaryLight,
+                    size: 22,
+                    color: accentColor,
                   ),
                 ),
                 const SizedBox(width: 10),
@@ -71,7 +75,7 @@ class StatCardWidget extends StatelessWidget {
                     overflow: TextOverflow.ellipsis,
                     style: TextStyle(
                       fontSize: 12,
-                      fontWeight: FontWeight.w500,
+                      fontWeight: FontWeight.w600,
                       color: isDark ? AppColors.darkTextSecondary : AppColors.lightTextSecondary,
                     ),
                   ),
@@ -85,7 +89,7 @@ class StatCardWidget extends StatelessWidget {
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
               style: TextStyle(
-                fontSize: 24,
+                fontSize: 22,
                 fontWeight: FontWeight.w800,
                 letterSpacing: -0.5,
                 color: isDark ? AppColors.darkTextPrimary : AppColors.lightTextPrimary,
