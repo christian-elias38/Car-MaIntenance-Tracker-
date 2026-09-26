@@ -9,6 +9,7 @@ import '../../../reminders/presentation/screens/reminders_screen.dart';
 import '../../../expenses/presentation/screens/fuel_costs_screen.dart';
 import 'end_cover_screen.dart';
 import '../../../auth/presentation/screens/login_screen.dart';
+import '../../../auth/presentation/screens/otp_auth_screen.dart';
 
 class ProfileSettingsScreen extends StatelessWidget {
   const ProfileSettingsScreen({super.key});
@@ -296,6 +297,19 @@ class ProfileSettingsScreen extends StatelessWidget {
                         onTap: () => Navigator.push(
                           context,
                           MaterialPageRoute(builder: (_) => const FuelCostsScreen()),
+                        ),
+                      ),
+                      const Divider(height: 1, indent: 60),
+                      _buildMenuItem(
+                        context,
+                        icon: Icons.phonelink_ring_rounded,
+                        title: 'Mobile OTP Security & Phone',
+                        isDark: isDark,
+                        onTap: () => Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => const OtpAuthScreen(isProfileConfigMode: true),
+                          ),
                         ),
                       ),
                       const Divider(height: 1, indent: 60),
