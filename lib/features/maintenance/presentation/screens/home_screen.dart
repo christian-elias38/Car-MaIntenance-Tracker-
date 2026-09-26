@@ -97,12 +97,15 @@ class _HomeScreenState extends State<HomeScreen> {
             return RefreshIndicator(
               color: AppColors.primaryLight,
               onRefresh: provider.fetchRecords,
-              child: SingleChildScrollView(
-                physics: const AlwaysScrollableScrollPhysics(),
-                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
+              child: Center(
+                child: ConstrainedBox(
+                  constraints: const BoxConstraints(maxWidth: 1100),
+                  child: SingleChildScrollView(
+                    physics: const AlwaysScrollableScrollPhysics(),
+                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
                     // Header Row: Good evening + Theme Toggle + Actions
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -340,51 +343,60 @@ class _HomeScreenState extends State<HomeScreen> {
                     AiVehicleBanner(vehicle: activeCar),
                     const SizedBox(height: 18),
 
-                    // 4 Reduced Stat Overview Grid (2x2)
-                    GridView.count(
-                      crossAxisCount: 2,
-                      shrinkWrap: true,
-                      physics: const NeverScrollableScrollPhysics(),
-                      crossAxisSpacing: 14,
-                      mainAxisSpacing: 14,
-                      childAspectRatio: 1.55,
-                      children: [
-                        StatCardWidget(
-                          icon: Icons.calendar_today_rounded,
-                          label: 'Upcoming Services',
-                          value: '${reminderProvider.upcomingReminders.isNotEmpty ? reminderProvider.upcomingReminders.length : 3}',
-                          onTap: () {
-                            if (widget.onNavigateTab != null) widget.onNavigateTab!(3);
-                          },
-                        ),
-                        StatCardWidget(
-                          icon: Icons.build_outlined,
-                          label: 'Total Services',
-                          value: '${provider.totalServicesCount > 0 ? provider.totalServicesCount : 12}',
-                          onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(builder: (_) => const ServiceHistoryScreen()),
-                            );
-                          },
-                        ),
-                        StatCardWidget(
-                          icon: Icons.account_balance_wallet_outlined,
-                          label: 'Total Spent',
-                          value: totalSpentFormatted != '${userProvider.currency}0' ? totalSpentFormatted : '${userProvider.currency}682',
-                          onTap: () {
-                            if (widget.onNavigateTab != null) widget.onNavigateTab!(2);
-                          },
-                        ),
-                        StatCardWidget(
-                          icon: Icons.event_available_outlined,
-                          label: 'Next Service',
-                          value: '12 days',
-                          onTap: () {
-                            if (widget.onNavigateTab != null) widget.onNavigateTab!(3);
-                          },
-                        ),
-                      ],
+                    // 4 Reduced Stat Overview Grid (Responsive 2 cols mobile, 4 cols tablet/desktop)
+                    LayoutBuilder(
+                      builder: (context, gridConstraints) {
+                        final isWide = gridConstraints.maxWidth > 650;
+                        return GridView.count(
+                          crossAxisCount: isWide ? 4 : 2,
+                          shrinkWrap: true,
+                          physics: const NeverScrollableScrollPhysics(),
+                          crossAxisSpacing: 14,
+                          mainAxisSpacing: 14,
+                          childAspectRatio: isWide ? 1.4 : 1.55,
+                          children: [
+                            StatCardWidget(
+                              icon: Icons.calendar_month_rounded,
+                              label: 'Upcoming Services',
+                              value: '${reminderProvider.upcomingReminders.isNotEmpty ? reminderProvider.upcomingReminders.length : 3}',
+                              accentColor: AppColors.statEmerald,
+                              onTap: () {
+                                if (widget.onNavigateTab != null) widget.onNavigateTab!(3);
+                              },
+                            ),
+                            StatCardWidget(
+                              icon: Icons.build_circle_rounded,
+                              label: 'Total Services',
+                              value: '${provider.totalServicesCount > 0 ? provider.totalServicesCount : 12}',
+                              accentColor: AppColors.statBlue,
+                              onTap: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(builder: (_) => const ServiceHistoryScreen()),
+                                );
+                              },
+                            ),
+                            StatCardWidget(
+                              icon: Icons.account_balance_wallet_rounded,
+                              label: 'Total Spent',
+                              value: totalSpentFormatted != '${userProvider.currency}0' ? totalSpentFormatted : '${userProvider.currency}682',
+                              accentColor: AppColors.statAmber,
+                              onTap: () {
+                                if (widget.onNavigateTab != null) widget.onNavigateTab!(2);
+                              },
+                            ),
+                            StatCardWidget(
+                              icon: Icons.timer_rounded,
+                              label: 'Next Service',
+                              value: '12 days',
+                              accentColor: AppColors.statPurple,
+                              onTap: () {
+                                if (widget.onNavigateTab != null) widget.onNavigateTab!(3);
+                              },
+                            ),
+                          ],
+                        );
+                      },
                     ),
                     const SizedBox(height: 24),
 
@@ -545,15 +557,17 @@ class _HomeScreenState extends State<HomeScreen> {
                           );
                         },
                       ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
-            );
-          },
-        ),
+            ),
+          );
+        },
       ),
-    );
-  }
+    ),
+  );
+}
 
 
 
