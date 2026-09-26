@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -25,7 +26,23 @@ class AppVehicleImage extends StatelessWidget {
 
     final trimmedPath = imagePath.trim();
 
-    if (trimmedPath.startsWith('http://') || trimmedPath.startsWith('https://')) {
+    if (trimmedPath.startsWith('data:image') || _isBase64(trimmedPath)) {
+      try {
+        final String cleanBase64 = trimmedPath.contains(',') 
+            ? trimmedPath.split(',').last 
+            : trimmedPath;
+        final bytes = base64Decode(cleanBase64);
+        imageWidget = Image.memory(
+          bytes,
+          width: width,
+          height: height,
+          fit: fit,
+          errorBuilder: (ctx, err, stack) => _buildFallback(context),
+        );
+      } catch (_) {
+        imageWidget = _buildFallback(context);
+      }
+    } else if (trimmedPath.startsWith('http://') || trimmedPath.startsWith('https://')) {
       imageWidget = Image.network(
         trimmedPath,
         width: width,
@@ -70,6 +87,12 @@ class AppVehicleImage extends StatelessWidget {
     }
 
     return imageWidget;
+  }
+
+  bool _isBase64(String str) {
+    if (str.length < 100) return false;
+    final clean = str.contains(',') ? str.split(',').last : str;
+    return RegExp(r'^[A-Za-z0-9+/=]+$').hasMatch(clean.replaceAll(RegExp(r'\s+'), ''));
   }
 
   Widget _buildFallback(BuildContext context) {
