@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../ai_assistant/presentation/widgets/ai_vehicle_banner.dart';
 import '../../data/models/vehicle_model.dart';
+import '../providers/vehicle_provider.dart';
 import '../widgets/add_vehicle_dialog.dart';
 import '../widgets/app_vehicle_image.dart';
 
@@ -10,62 +12,76 @@ class VehicleDetailsScreen extends StatelessWidget {
 
   const VehicleDetailsScreen({super.key, required this.vehicle});
 
-  void _showEditDialog(BuildContext context) {
+  void _showEditDialog(BuildContext context, VehicleModel currentVehicle) {
     showDialog(
       context: context,
-      builder: (_) => AddVehicleDialog(vehicleToEdit: vehicle),
+      builder: (_) => AddVehicleDialog(vehicleToEdit: currentVehicle),
     );
   }
 
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final vehicleProvider = context.watch<VehicleProvider>();
+    final currentVehicle = vehicleProvider.vehicles.firstWhere(
+      (v) => v.id == vehicle.id,
+      orElse: () => vehicle,
+    );
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(vehicle.displayName),
+        title: Text(currentVehicle.displayName),
         elevation: 0,
         actions: [
           IconButton(
             icon: const Icon(Icons.edit_outlined),
-            onPressed: () => _showEditDialog(context),
+            onPressed: () => _showEditDialog(context, currentVehicle),
             tooltip: 'Edit Details',
           ),
         ],
       ),
       body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Hero Vehicle Photo Container with Badges Overlay & Tap to Change Photo
-              GestureDetector(
-                onTap: () => _showEditDialog(context),
-                child: Stack(
-                  children: [
-                    Container(
-                      width: double.infinity,
-                      height: 230,
-                      decoration: BoxDecoration(
-                        color: isDark ? AppColors.darkCard : Colors.white,
-                        borderRadius: BorderRadius.circular(24),
-                        border: Border.all(
-                          color: isDark ? AppColors.darkBorder : AppColors.lightBorder,
-                        ),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withValues(alpha: 0.08),
-                            blurRadius: 18,
-                            offset: const Offset(0, 6),
-                          ),
-                        ],
-                      ),
-                      child: AppVehicleImage(
-                        imagePath: vehicle.imagePath,
-                        borderRadius: BorderRadius.circular(24),
-                      ),
-                    ),
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            final isWide = constraints.maxWidth > 700;
+            return Center(
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 1000),
+                child: SingleChildScrollView(
+                  padding: EdgeInsets.symmetric(
+                    horizontal: isWide ? 32 : 20,
+                    vertical: 16,
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // Hero Vehicle Photo Container with Badges Overlay & Tap to Change Photo
+                      GestureDetector(
+                        onTap: () => _showEditDialog(context, currentVehicle),
+                        child: Stack(
+                          children: [
+                            Container(
+                              width: double.infinity,
+                              height: isWide ? 320 : 230,
+                              decoration: BoxDecoration(
+                                color: isDark ? AppColors.darkCard : Colors.white,
+                                borderRadius: BorderRadius.circular(24),
+                                border: Border.all(
+                                  color: isDark ? AppColors.darkBorder : AppColors.lightBorder,
+                                ),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.black.withValues(alpha: 0.08),
+                                    blurRadius: 18,
+                                    offset: const Offset(0, 6),
+                                  ),
+                                ],
+                              ),
+                              child: AppVehicleImage(
+                                imagePath: currentVehicle.imagePath,
+                                borderRadius: BorderRadius.circular(24),
+                              ),
+                            ),
 
                     // Overlay Gradient
                     Positioned.fill(
@@ -324,7 +340,7 @@ class VehicleDetailsScreen extends StatelessWidget {
                 width: double.infinity,
                 height: 54,
                 child: ElevatedButton.icon(
-                  onPressed: () => _showEditDialog(context),
+                  onPressed: () => _showEditDialog(context, currentVehicle),
                   icon: const Icon(Icons.edit_rounded, color: Colors.white),
                   label: const Text(
                     'Edit All Vehicle Details',
@@ -342,9 +358,13 @@ class VehicleDetailsScreen extends StatelessWidget {
                   ),
                 ),
               ),
-              const SizedBox(height: 24),
-            ],
-          ),
+                      const SizedBox(height: 24),
+                    ],
+                  ),
+                ),
+              ),
+            );
+          },
         ),
       ),
     );
